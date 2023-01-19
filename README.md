@@ -23,7 +23,7 @@ The command formats are as follows:
   * CSS Address is 0b00110000 or 0x30
 
 ## Response
-Response formats are as follows:
+Telemetry is returned at a rate of 1 MHz in big endian format. Response formats are as follows:
 * Telemetry
   * uint16, Voltage1
   * uint16, Voltage2
