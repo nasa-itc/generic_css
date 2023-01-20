@@ -43,7 +43,6 @@ Refer to the file [fsw/platform_inc/generic_eps_platform_cfg.h](fsw/platform_inc
 configuration settings, as well as a summary on overriding parameters in mission-specific repositories.
 
 ## Simulation
-The default configuration returns data that is X * 0.001, Y * 0.002, and Z * 0.003.
 
 ## 42
 
