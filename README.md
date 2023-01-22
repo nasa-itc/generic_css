@@ -39,8 +39,6 @@ Telemetry is returned at a rate of 1 MHz in big endian format. Response formats 
 The various configuration parameters available for each portion of the component are captured below.
 
 ## FSW
-Refer to the file [fsw/platform_inc/generic_eps_platform_cfg.h](fsw/platform_inc/generic_eps_platform_cfg.h) for the default
-configuration settings, as well as a summary on overriding parameters in mission-specific repositories.
 
 ## Simulation
 
