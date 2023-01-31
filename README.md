@@ -20,17 +20,12 @@ The generic_css device is simple in function. It is addressed by the master soft
 ## Commands
 The command formats are as follows:
 * uint8, Address
-  * CSS Address is 0b00110000 or 0x30
+  * CSS Address is 0b01000000 or 0x40
 
 ## Response
 Telemetry is returned at a rate of 1 MHz in big endian format. Response formats are as follows:
 * Telemetry
-  * uint16, Voltage1
-  * uint16, Voltage2
-  * uint16, Voltage3
-  * uint16, Voltage4
-  * uint16, Voltage5
-  * uint16, Voltage6
+  * uint16, Voltage [0-5]
 * Conversion table
   * Voltages = (uint16 value * 0.001 V)
 

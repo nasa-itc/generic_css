@@ -10,7 +10,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include <Client/Bus.hpp>
-#include <Uart/Client/Uart.hpp> /* TODO: Change if your protocol bus is different (e.g. SPI, I2C, etc.) */
+#include <I2C/Client/I2CSlave.hpp> /* TODO: Change if your protocol bus is different (e.g. SPI, I2C, etc.) */
 
 #include <sim_i_data_provider.hpp>
 #include <generic_css_data_point.hpp>
@@ -41,11 +41,11 @@ namespace Nos3
         /* Private helper methods */
         void create_generic_css_hk(std::vector<uint8_t>& out_data); 
         void create_generic_css_data(std::vector<uint8_t>& out_data); 
-        void uart_read_callback(const uint8_t *buf, size_t len); /* Handle data the hardware receives from its protocol bus */
+        std::uint_8_t determine_i2c_response_for_request(const std:;vector<uint8_t>& in_data);
         void command_callback(NosEngine::Common::Message msg); /* Handle backdoor commands and time tick to the simulator */
 
         /* Private data members */
-        std::unique_ptr<NosEngine::Uart::Uart>              _uart_connection; /* TODO: Change if your protocol bus is different (e.g. SPI, I2C, etc.) */
+        class I2CSlaveConnection*                           _i2c_slave_connection; /* TODO: Change if your protocol bus is different (e.g. SPI, I2C, etc.) */
         std::unique_ptr<NosEngine::Client::Bus>             _time_bus; /* Standard */
 
         SimIDataProvider*                                   _generic_css_dp; /* Only needed if the sim has a data provider */
@@ -55,6 +55,17 @@ namespace Nos3
         std::uint32_t                                       _count;
         std::uint32_t                                       _config;
         std::uint32_t                                       _status;
+    };
+
+    class I2CSlaveConnection : public NosEngine::I2C::I2CSlave
+    {
+    public:
+        I2CSlaveConnection(Generic_cssHardwareModel* hm, int bus_address, std::string connection_string, std::string bus_name);
+        size_t i2c_read(uint8_t *rbuf, size_t rlen);
+        size_t i2c_write(const uint8_t *wbuf, size_t wlen);
+    private:
+        Generic_cssHardwareModel* _hardware_model;
+        std::uint8_t _i2c_out_data;
     };
 }
 

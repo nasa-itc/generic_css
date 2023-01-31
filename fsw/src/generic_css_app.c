@@ -155,7 +155,7 @@ int32 GENERIC_CSS_AppInit(void)
     /*
     ** Create the Software Bus command pipe 
     */
-    status = CFE_SB_CreatePipe(&GENERIC_CSS_AppData.CmdPipe, GENERIC_CSS_PIPE_DEPTH, "GENERIC_CSS_CMD_PIPE");
+    status = CFE_SB_CreatePipe(&GENERIC_CSS_AppData.CmdPipe, GENERIC_CSS_PIPE_DEPTH, "CSS_CMD_PIPE");
     if (status != CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(GENERIC_CSS_PIPE_ERR_EID, CFE_EVS_ERROR,

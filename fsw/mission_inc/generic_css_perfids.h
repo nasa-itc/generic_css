@@ -16,7 +16,7 @@
 ** id conflict with other apps.  Performance IDs are used for cFE performance
 ** metrics.
 */
-#define GENERIC_CSS_PERF_ID          500
-#define GENERIC_CSS_DEVICE_PERF_ID   501
+#define GENERIC_CSS_PERF_ID          600
+#define GENERIC_CSS_DEVICE_PERF_ID   601
 
 #endif /* _GENERIC_CSS_PERFIDS_H_ */

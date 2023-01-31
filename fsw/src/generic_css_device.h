@@ -36,6 +36,9 @@
 #define GENERIC_CSS_DEVICE_HDR_TRL_LEN      4
 #define GENERIC_CSS_DEVICE_CMD_SIZE         9
 
+#define GENERIC_CSS_I2C_ADDRESS             0x40
+#define GENERIC_CSS_NUM_CHANNELS            6
+
 /*
 ** GENERIC_CSS device housekeeping telemetry definition
 */
@@ -55,23 +58,23 @@ typedef struct
 */
 typedef struct
 {
-    uint32_t  DeviceCounter;
-    uint16_t  DeviceDataX;
-    uint16_t  DeviceDataY;
-    uint16_t  DeviceDataZ;
-
+    uint16 Voltage[NUM_ADC_CHANNELS];
 } OS_PACK GENERIC_CSS_Device_Data_tlm_t;
 #define GENERIC_CSS_DEVICE_DATA_LNGTH sizeof ( GENERIC_CSS_Device_Data_tlm_t )
-#define GENERIC_CSS_DEVICE_DATA_SIZE GENERIC_CSS_DEVICE_DATA_LNGTH + GENERIC_CSS_DEVICE_HDR_TRL_LEN
+//#define GENERIC_CSS_DEVICE_DATA_SIZE GENERIC_CSS_DEVICE_DATA_LNGTH + GENERIC_CSS_DEVICE_HDR_TRL_LEN
 
 
 /*
 ** Prototypes
 */
+
+int32_t GENERIC_CSS_ReadData(int32_t handle, uint8_t* read_data, uint8_t data_length);
+int32_t GENERIC_CSS_RequestData(int32_t handle, GENERIC_CSS_Device_Data_tlm_t* data);
+/*
 int32_t GENERIC_CSS_ReadData(int32_t handle, uint8_t* read_data, uint8_t data_length);
 int32_t GENERIC_CSS_CommandDevice(int32_t handle, uint8_t cmd, uint32_t payload);
 int32_t GENERIC_CSS_RequestHK(int32_t handle, GENERIC_CSS_Device_HK_tlm_t* data);
 int32_t GENERIC_CSS_RequestData(int32_t handle, GENERIC_CSS_Device_Data_tlm_t* data);
-
+*/
 
 #endif /* _GENERIC_CSS_DEVICE_H_ */
