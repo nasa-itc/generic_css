@@ -90,7 +90,7 @@ int32 GENERIC_CSS_AppInit(void);
 void  GENERIC_CSS_ProcessCommandPacket(void);
 void  GENERIC_CSS_ProcessGroundCommand(void);
 void  GENERIC_CSS_ProcessTelemetryRequest(void);
-void  GENERIC_CSS_ReportHousekeeping(void);
+//void  GENERIC_CSS_ReportHousekeeping(void);
 void  GENERIC_CSS_ReportDeviceTelemetry(void);
 void  GENERIC_CSS_ResetCounters(void);
 void  GENERIC_CSS_Enable(void);

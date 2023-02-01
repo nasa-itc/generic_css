@@ -257,7 +257,7 @@ void GENERIC_CSS_ProcessCommandPacket(void)
         ** Ground Commands with command codes fall under the GENERIC_CSS_CMD_MID (Message ID)
         */
         case GENERIC_CSS_CMD_MID:
-            GENERIC_CSS_ProcessGroundCommand();
+            //GENERIC_CSS_ProcessGroundCommand();
             break;
 
         /*
@@ -354,11 +354,12 @@ void GENERIC_CSS_ProcessGroundCommand(void)
         ** Set Configuration Command
         ** Note that this is an example of a command that has additional arguments
         */
+        /*
         case GENERIC_CSS_CONFIG_CC:
             if (GENERIC_CSS_VerifyCmdLength(GENERIC_CSS_AppData.MsgPtr, sizeof(GENERIC_CSS_Config_cmd_t)) == OS_SUCCESS)
             {
                 CFE_EVS_SendEvent(GENERIC_CSS_CMD_CONFIG_INF_EID, CFE_EVS_INFORMATION, "GENERIC_CSS: Configuration command received");
-                /* Command device to send HK */
+                // Command device to send HK
                 status = GENERIC_CSS_CommandDevice(GENERIC_CSS_AppData.Generic_cssUart.handle, GENERIC_CSS_DEVICE_CFG_CMD, ((GENERIC_CSS_Config_cmd_t*) GENERIC_CSS_AppData.MsgPtr)->DeviceCfg);
                 if (status == OS_SUCCESS)
                 {
@@ -370,7 +371,7 @@ void GENERIC_CSS_ProcessGroundCommand(void)
                 }
             }
             break;
-
+        */
         /*
         ** Invalid Command Codes
         */
@@ -401,7 +402,7 @@ void GENERIC_CSS_ProcessTelemetryRequest(void)
     switch (CommandCode)
     {
         case GENERIC_CSS_REQ_HK_TLM:
-            GENERIC_CSS_ReportHousekeeping();
+            //GENERIC_CSS_ReportHousekeeping();
             break;
 
         case GENERIC_CSS_REQ_DATA_TLM:
@@ -425,11 +426,12 @@ void GENERIC_CSS_ProcessTelemetryRequest(void)
 /* 
 ** Report Application Housekeeping
 */
+/*
 void GENERIC_CSS_ReportHousekeeping(void)
 {
     int32 status = OS_SUCCESS;
 
-    /* Check that device is enabled */
+    // Check that device is enabled
     if (GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled == GENERIC_CSS_DEVICE_ENABLED)
     {
         status = GENERIC_CSS_RequestHK(GENERIC_CSS_AppData.Generic_cssUart.handle, (GENERIC_CSS_Device_HK_tlm_t*) &GENERIC_CSS_AppData.HkTelemetryPkt.DeviceHK);
@@ -444,14 +446,14 @@ void GENERIC_CSS_ReportHousekeeping(void)
                     "GENERIC_CSS: Request device HK reported error %d", status);
         }
     }
-    /* Intentionally do not report errors if disabled */
+    // Intentionally do not report errors if disabled
 
-    /* Time stamp and publish housekeeping telemetry */
+    // Time stamp and publish housekeeping telemetry
     CFE_SB_TimeStampMsg((CFE_SB_Msg_t *) &GENERIC_CSS_AppData.HkTelemetryPkt);
     CFE_SB_SendMsg((CFE_SB_Msg_t *) &GENERIC_CSS_AppData.HkTelemetryPkt);
     return;
 }
-
+*/
 
 /*
 ** Collect and Report Device Telemetry

@@ -41,7 +41,7 @@ namespace Nos3
         /* Private helper methods */
         void create_generic_css_hk(std::vector<uint8_t>& out_data); 
         void create_generic_css_data(std::vector<uint8_t>& out_data); 
-        std::uint_8_t determine_i2c_response_for_request(const std:;vector<uint8_t>& in_data);
+        std::uint8_t determine_i2c_response_for_request(const std::vector<uint8_t>& in_data);
         void command_callback(NosEngine::Common::Message msg); /* Handle backdoor commands and time tick to the simulator */
 
         /* Private data members */

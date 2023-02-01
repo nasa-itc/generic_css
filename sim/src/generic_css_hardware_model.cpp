@@ -19,17 +19,18 @@ namespace Nos3
 
         /* Get on a protocol bus */
         /* Note: Initialized defaults in case value not found in config file */
+        /*
         std::string bus_name = "usart_29";
         int node_port = 29;
         if (config.get_child_optional("simulator.hardware-model.connections")) 
         {
-            /* Loop through the connections for hardware model */
+            // Loop through the connections for hardware model
             BOOST_FOREACH(const boost::property_tree::ptree::value_type &v, config.get_child("simulator.hardware-model.connections"))
             {
-                /* v.second is the child tree (v.first is the name of the child) */
+                // v.second is the child tree (v.first is the name of the child)
                 if (v.second.get("type", "").compare("usart") == 0)
                 {
-                    /* Configuration found */
+                    // Configuration found
                     bus_name = v.second.get("bus-name", bus_name);
                     node_port = v.second.get("node-port", node_port);
                     break;
@@ -40,29 +41,29 @@ namespace Nos3
         _uart_connection->open(node_port);
         sim_logger->info("Generic_cssHardwareModel::Generic_cssHardwareModel:  Now on UART bus name %s, port %d.", bus_name.c_str(), node_port);
     
-        /* Configure protocol callback */
+        // Configure protocol callback
         _uart_connection->set_read_callback(std::bind(&Generic_cssHardwareModel::uart_read_callback, this, std::placeholders::_1, std::placeholders::_2));
 
-        /* Get on the command bus*/
+        // Get on the command bus
         std::string time_bus_name = "command";
         if (config.get_child_optional("hardware-model.connections")) 
         {
-            /* Loop through the connections for the hardware model */
+            // Loop through the connections for the hardware model
             BOOST_FOREACH(const boost::property_tree::ptree::value_type &v, config.get_child("hardware-model.connections"))
             {
-                /* v.first is the name of the child */
-                /* v.second is the child tree */
+                // v.first is the name of the child
+                // v.second is the child tree
                 if (v.second.get("type", "").compare("time") == 0) // 
                 {
                     time_bus_name = v.second.get("bus-name", "command");
-                    /* Found it... don't need to go through any more items*/
+                    // Found it... don't need to go through any more items
                     break; 
                 }
             }
         }
         _time_bus.reset(new NosEngine::Client::Bus(_hub, connection_string, time_bus_name));
         sim_logger->info("Generic_cssHardwareModel::Generic_cssHardwareModel:  Now on time bus named %s.", time_bus_name.c_str());
-
+        */
         /* Construction complete */
         sim_logger->info("Generic_cssHardwareModel::Generic_cssHardwareModel:  Construction complete.");
     }
@@ -71,7 +72,7 @@ namespace Nos3
     Generic_cssHardwareModel::~Generic_cssHardwareModel(void)
     {        
         /* Close the protocol bus */
-        _uart_connection->close();
+        //_uart_connection->close();
 
         /* Clean up the data provider */
         delete _generic_css_dp;
@@ -214,6 +215,7 @@ namespace Nos3
 
 
     /* Protocol callback */
+    /*
     void Generic_cssHardwareModel::uart_read_callback(const uint8_t *buf, size_t len)
     {
         std::vector<uint8_t> out_data; 
@@ -221,12 +223,12 @@ namespace Nos3
         
         std::uint32_t rcv_config;
 
-        /* Retrieve data and log in man readable format */
+        // Retrieve data and log in man readable format
         std::vector<uint8_t> in_data(buf, buf + len);
         sim_logger->debug("Generic_cssHardwareModel::uart_read_callback:  REQUEST %s",
             SimIHardwareModel::uint8_vector_to_hex_string(in_data).c_str());
 
-        /* Check simulator is enabled */
+        // Check simulator is enabled
         if (_enabled != GENERIC_CSS_SIM_SUCCESS)
         {
             sim_logger->debug("Generic_cssHardwareModel::uart_read_callback:  Generic_css sim disabled!");
@@ -234,7 +236,7 @@ namespace Nos3
         }
         else
         {
-            /* Check if message is incorrect size */
+            // Check if message is incorrect size
             if (in_data.size() != 9)
             {
                 sim_logger->debug("Generic_cssHardwareModel::uart_read_callback:  Invalid command size of %d received!", in_data.size());
@@ -242,7 +244,7 @@ namespace Nos3
             }
             else
             {
-                /* Check header - 0xDEAD */
+                // Check header - 0xDEAD
                 if ((in_data[0] != 0xDE) || (in_data[1] !=0xAD))
                 {
                     sim_logger->debug("Generic_cssHardwareModel::uart_read_callback:  Header incorrect!");
@@ -250,7 +252,7 @@ namespace Nos3
                 }
                 else
                 {
-                    /* Check trailer - 0xBEEF */
+                    // Check trailer - 0xBEEF
                     if ((in_data[7] != 0xBE) || (in_data[8] !=0xEF))
                     {
                         sim_logger->debug("Generic_cssHardwareModel::uart_read_callback:  Trailer incorrect!");
@@ -258,7 +260,7 @@ namespace Nos3
                     }
                     else
                     {
-                        /* Increment count as valid command format received */
+                        // Increment count as valid command format received
                         _count++;
                     }
                 }
@@ -266,28 +268,28 @@ namespace Nos3
 
             if (valid == GENERIC_CSS_SIM_SUCCESS)
             {   
-                /* Process command */
+                // Process command
                 switch (in_data[2])
                 {
                     case 0:
-                        /* NOOP */
+                        // NOOP
                         sim_logger->debug("Generic_cssHardwareModel::uart_read_callback:  NOOP command received!");
                         break;
 
                 case 1:
-                        /* Request HK */
+                        // Request HK
                         sim_logger->debug("Generic_cssHardwareModel::uart_read_callback:  Send HK command received!");
                         create_generic_css_hk(out_data);
                         break;
 
                     case 2:
-                        /* Request data */
+                        // Request data
                         sim_logger->debug("Generic_cssHardwareModel::uart_read_callback:  Send data command received!");
                         create_generic_css_data(out_data);
                         break;
 
                     case 3:
-                        /* Configuration */
+                        // Configuration
                         sim_logger->debug("Generic_cssHardwareModel::uart_read_callback:  Configuration command received!");
                         _config  = in_data[3] << 24;
                         _config |= in_data[4] << 16;
@@ -296,7 +298,7 @@ namespace Nos3
                         break;
                     
                     default:
-                        /* Unused command code */
+                        // Unused command code
                         valid = GENERIC_CSS_SIM_ERROR;
                         sim_logger->debug("Generic_cssHardwareModel::uart_read_callback:  Unused command %d received!", in_data[2]);
                         break;
@@ -304,13 +306,13 @@ namespace Nos3
             }
         }
 
-        /* Increment count and echo command since format valid */
+        // Increment count and echo command since format valid
         if (valid == GENERIC_CSS_SIM_SUCCESS)
         {
             _count++;
             _uart_connection->write(&in_data[0], in_data.size());
 
-            /* Send response if existing */
+            // Send response if existing
             if (out_data.size() > 0)
             {
                 sim_logger->debug("Generic_cssHardwareModel::uart_read_callback:  REPLY %s",
@@ -319,4 +321,5 @@ namespace Nos3
             }
         }
     }
+    */
 }

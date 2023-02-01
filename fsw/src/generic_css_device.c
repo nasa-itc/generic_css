@@ -30,7 +30,7 @@ int32_t GENERIC_CSS_ReadData(int32_t handle, uint8_t* read_data, uint8_t data_le
     int32_t status = OS_SUCCESS;
     uint8* response;
 
-    status = i2c_master_transaction(handle, GENERIC_CSS_I2C_ADDRESS, null, 0, &response, data_length, GENERIC_CSS_CFG_MS_TIMEOUT);
+    status = i2c_master_transaction(handle, GENERIC_CSS_I2C_ADDRESS, NULL, 0, &response, data_length, GENERIC_CSS_CFG_MS_TIMEOUT);
     if (status != OS_SUCCESS)
     {
         *read_data = 0.0;
@@ -38,12 +38,12 @@ int32_t GENERIC_CSS_ReadData(int32_t handle, uint8_t* read_data, uint8_t data_le
     }
     else
     {
-        *read_data[0] = GENERIC_CSS_TelemetryConversion((response[0] << 8) && response[1]);
-        *read_data[1] = GENERIC_CSS_TelemetryConversion((response[2] << 8) && response[3]);
-        *read_data[2] = GENERIC_CSS_TelemetryConversion((response[4] << 8) && response[5]);
-        *read_data[3] = GENERIC_CSS_TelemetryConversion((response[6] << 8) && response[7]);
-        *read_data[4] = GENERIC_CSS_TelemetryConversion((response[8] << 8) && response[9]);
-        *read_data[5] = GENERIC_CSS_TelemetryConversion((response[10] << 8) && response[11]);
+        read_data[0] = GENERIC_CSS_TelemetryConversion((response[0] << 8) | response[1]);
+        read_data[1] = GENERIC_CSS_TelemetryConversion((response[2] << 8) | response[3]);
+        read_data[2] = GENERIC_CSS_TelemetryConversion((response[4] << 8) | response[5]);
+        read_data[3] = GENERIC_CSS_TelemetryConversion((response[6] << 8) | response[7]);
+        read_data[4] = GENERIC_CSS_TelemetryConversion((response[8] << 8) | response[9]);
+        read_data[5] = GENERIC_CSS_TelemetryConversion((response[10] << 8) | response[11]);
     }
 
     return status;
@@ -83,7 +83,12 @@ int32_t GENERIC_CSS_RequestData(int32_t handle, GENERIC_CSS_Device_Data_tlm_t* d
                 (read_data[13] == GENERIC_CSS_DEVICE_TRAILER_1) )
             {
             */
-                data->Voltage = read_data;
+                data->Voltage[0] = read_data[0];
+                data->Voltage[1] = read_data[1];
+                data->Voltage[2] = read_data[2];
+                data->Voltage[3] = read_data[3];
+                data->Voltage[4] = read_data[4];
+                data->Voltage[5] = read_data[5];
 
                 #ifdef GENERIC_CSS_CFG_DEBUG
                     //OS_printf("  Header  = 0x%02x%02x  \n", read_data[0], read_data[1]);
@@ -166,15 +171,15 @@ int32_t GENERIC_EPS_CommandDevice(int32_t handle, uint8_t cmd, uint8_t value)
     uint8_t write_data[3] = {0};
     uint8_t i;
 
-    /* Confirm command valid 
+    // Confirm command valid 
     if (cmd < 0xAB)
     {
-        /* Prepare command 
+        // Prepare command 
         write_data[0] = cmd;
         write_data[1] = value;
         write_data[2] = GENERIC_EPS_CRC8(write_data, 1);
 
-        /* Initiate transaction 
+        // Initiate transaction 
         i2c_master_transaction(handle, GENERIC_EPS_CFG_I2C_ADDRESS,
                                write_data, 3, 
                                NULL, 0, 
@@ -200,11 +205,11 @@ int32_t GENERIC_CSS_RequestHK(int32_t handle, GENERIC_CSS_Device_HK_tlm_t* data)
     int32_t status = OS_SUCCESS;
     uint8_t read_data[GENERIC_CSS_DEVICE_HK_SIZE] = {0};
 
-    /* Command device to send HK 
+    // Command device to send HK 
     status = GENERIC_CSS_CommandDevice(handle, GENERIC_CSS_DEVICE_REQ_HK_CMD, 0);
     if (status == OS_SUCCESS)
     {
-        /* Read HK data 
+        // Read HK data 
         status = GENERIC_CSS_ReadData(handle, read_data, sizeof(read_data));
         if (status == OS_SUCCESS)
         {
@@ -217,7 +222,7 @@ int32_t GENERIC_CSS_RequestHK(int32_t handle, GENERIC_CSS_Device_HK_tlm_t* data)
                 OS_printf("\n");
             #endif
 
-            /* Verify data header and trailer 
+            // Verify data header and trailer 
             if ((read_data[0]  == GENERIC_CSS_DEVICE_HDR_0)     && 
                 (read_data[1]  == GENERIC_CSS_DEVICE_HDR_1)     && 
                 (read_data[14] == GENERIC_CSS_DEVICE_TRAILER_0) && 
@@ -253,7 +258,7 @@ int32_t GENERIC_CSS_RequestHK(int32_t handle, GENERIC_CSS_Device_HK_tlm_t* data)
                 #endif 
                 status = OS_ERROR;
             }
-        } /* GENERIC_CSS_ReadData 
+        } // GENERIC_CSS_ReadData 
     }
     else
     {
