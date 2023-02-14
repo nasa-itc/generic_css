@@ -1,5 +1,5 @@
 TELEMETRY GENERIC_CSS GENERIC_CSS_HK_TLM LITTLE_ENDIAN "GENERIC_CSS_Hk_tlm_t"
-  APPEND_ID_ITEM CCSDS_STREAMID       16 UINT 0x08FA  "CCSDS Packet Identification" BIG_ENDIAN
+  APPEND_ID_ITEM CCSDS_STREAMID       16 UINT 0x0910  "CCSDS Packet Identification" BIG_ENDIAN
   APPEND_ITEM    CCSDS_SEQUENCE       16 UINT         "CCSDS Packet Sequence Control" BIG_ENDIAN
   APPEND_ITEM    CCSDS_LENGTH         16 UINT         "CCSDS Packet Data Length" BIG_ENDIAN
   APPEND_ITEM    CCSDS_SECONDS        32 UINT         "CCSDS Telemetry Secondary Header (seconds)"
@@ -17,7 +17,7 @@ TELEMETRY GENERIC_CSS GENERIC_CSS_HK_TLM LITTLE_ENDIAN "GENERIC_CSS_Hk_tlm_t"
   APPEND_ITEM    DEVICE_STATUS        32 UINT         "Reported Device Status"
 
 TELEMETRY GENERIC_CSS GENERIC_CSS_DATA_TLM LITTLE_ENDIAN "GENERIC_CSS_Device_tlm_t"
-  APPEND_ID_ITEM CCSDS_STREAMID       16 UINT 0x08FB  "CCSDS Packet Identification" BIG_ENDIAN
+  APPEND_ID_ITEM CCSDS_STREAMID       16 UINT 0x0911  "CCSDS Packet Identification" BIG_ENDIAN
   APPEND_ITEM    CCSDS_SEQUENCE       16 UINT         "CCSDS Packet Sequence Control" BIG_ENDIAN
   APPEND_ITEM    CCSDS_LENGTH         16 UINT         "CCSDS Packet Data Length" BIG_ENDIAN
   APPEND_ITEM    CCSDS_SECONDS        32 UINT         "CCSDS Telemetry Secondary Header (seconds)"
@@ -27,7 +27,6 @@ TELEMETRY GENERIC_CSS GENERIC_CSS_DATA_TLM LITTLE_ENDIAN "GENERIC_CSS_Device_tlm
   APPEND_ITEM    RAW_GENERIC_CSS_X         16 UINT         "Raw generic_css data x component (1-65535)"
   APPEND_ITEM    RAW_GENERIC_CSS_Y         16 UINT         "Raw generic_css data y component (1-65535)"
   APPEND_ITEM    RAW_GENERIC_CSS_Z         16 UINT         "Raw generic_css data z component (1-65535)"
-#  APPEND_ITEM    PAD                  16 UINT         "Because the packed struct it came from has a stride address of 32 and cFS does not serialize"
   APPEND_ITEM    GENERIC_CSS_X              0 DERIVED      "Generic_css data unit vector x component (-1.0 to 1.0)"
     GENERIC_READ_CONVERSION_START FLOAT 32
       (packet.read("RAW_GENERIC_CSS_X") - 32768.0)/32767.0
