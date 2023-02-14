@@ -66,7 +66,7 @@ typedef struct
     ** Device protocol
     ** TODO: Make specific to your application
     */ 
-    uart_info_t Generic_cssUart;             /* Hardware protocol definition */
+    i2c_bus_info_t Generic_cssI2c;             /* Hardware protocol definition */
 
 } GENERIC_CSS_AppData_t;
 

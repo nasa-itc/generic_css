@@ -38,12 +38,7 @@ int32_t GENERIC_CSS_ReadData(int32_t handle, uint8_t* read_data, uint8_t data_le
     }
     else
     {
-        read_data[0] = GENERIC_CSS_TelemetryConversion((response[0] << 8) | response[1]);
-        read_data[1] = GENERIC_CSS_TelemetryConversion((response[2] << 8) | response[3]);
-        read_data[2] = GENERIC_CSS_TelemetryConversion((response[4] << 8) | response[5]);
-        read_data[3] = GENERIC_CSS_TelemetryConversion((response[6] << 8) | response[7]);
-        read_data[4] = GENERIC_CSS_TelemetryConversion((response[8] << 8) | response[9]);
-        read_data[5] = GENERIC_CSS_TelemetryConversion((response[10] << 8) | response[11]);
+        read_data = response;
     }
 
     return status;
@@ -52,11 +47,10 @@ int32_t GENERIC_CSS_ReadData(int32_t handle, uint8_t* read_data, uint8_t data_le
 /*
 ** Request data command
 */
-int32_t GENERIC_CSS_RequestData(int32_t handle, GENERIC_CSS_Device_Data_tlm_t* data)
+int32_t GENERIC_CSS_RequestData(int32_t handle, GENERIC_CSS_Device_Data_tlm_t* data, GENERIC_CSS_Device_HK_tlm_t* hk)
 {
     int32_t status = OS_SUCCESS;
-    uint8_t read_data[GENERIC_CSS_DEVICE_DATA_LNGTH] = {0};
-    //uint8_t read_data[GENERIC_CSS_DEVICE_DATA_SIZE] = {0};
+    uint8_t read_data[GENERIC_CSS_DEVICE_TOTAL_LNGTH] = {0};
 
     /* Command device to send HK */
     //status = GENERIC_CSS_CommandDevice(handle, GENERIC_CSS_DEVICE_REQ_DATA_CMD, 0);
@@ -83,12 +77,28 @@ int32_t GENERIC_CSS_RequestData(int32_t handle, GENERIC_CSS_Device_Data_tlm_t* d
                 (read_data[13] == GENERIC_CSS_DEVICE_TRAILER_1) )
             {
             */
-                data->Voltage[0] = read_data[0];
-                data->Voltage[1] = read_data[1];
-                data->Voltage[2] = read_data[2];
-                data->Voltage[3] = read_data[3];
-                data->Voltage[4] = read_data[4];
-                data->Voltage[5] = read_data[5];
+
+                hk->DeviceCounter  = read_data[0] << 24;
+                hk->DeviceCounter |= read_data[1] << 16;
+                hk->DeviceCounter |= read_data[2] << 8;
+                hk->DeviceCounter |= read_data[3];
+
+                hk->DeviceConfig  = read_data[4] << 24;
+                hk->DeviceConfig |= read_data[5] << 16;
+                hk->DeviceConfig |= read_data[6] << 8;
+                hk->DeviceConfig |= read_data[7];
+
+                hk->DeviceStatus  = read_data[8] << 24;
+                hk->DeviceStatus |= read_data[9] << 16;
+                hk->DeviceStatus |= read_data[10] << 8;
+                hk->DeviceStatus |= read_data[11];
+
+                data->Voltage[0] = GENERIC_CSS_TelemetryConversion((read_data[12] << 8) | read_data[13]);
+                data->Voltage[1] = GENERIC_CSS_TelemetryConversion((read_data[14] << 8) | read_data[15]);
+                data->Voltage[2] = GENERIC_CSS_TelemetryConversion((read_data[16] << 8) | read_data[17]);
+                data->Voltage[3] = GENERIC_CSS_TelemetryConversion((read_data[18] << 8) | read_data[19]);
+                data->Voltage[4] = GENERIC_CSS_TelemetryConversion((read_data[20] << 8) | read_data[21]);
+                data->Voltage[5] = GENERIC_CSS_TelemetryConversion((read_data[22] << 8) | read_data[23]);
 
                 #ifdef GENERIC_CSS_CFG_DEBUG
                     //OS_printf("  Header  = 0x%02x%02x  \n", read_data[0], read_data[1]);

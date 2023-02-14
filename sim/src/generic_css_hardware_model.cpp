@@ -19,30 +19,31 @@ namespace Nos3
 
         /* Get on a protocol bus */
         /* Note: Initialized defaults in case value not found in config file */
-        /*
-        std::string bus_name = "usart_29";
-        int node_port = 29;
-        if (config.get_child_optional("simulator.hardware-model.connections")) 
+       
+        std::string bus_name = "i2c_2";
+        int i2c_bus_address = 64; // 0x40
+/*
+        if (config.get_child_optional("simulator.hardware-model.i2c")) 
         {
             // Loop through the connections for hardware model
-            BOOST_FOREACH(const boost::property_tree::ptree::value_type &v, config.get_child("simulator.hardware-model.connections"))
+            BOOST_FOREACH(const boost::property_tree::ptree::value_type &v, config.get_child("simulator.hardware-model.i2c"))
             {
                 // v.second is the child tree (v.first is the name of the child)
-                if (v.second.get("type", "").compare("usart") == 0)
+                if (v.second.get("i2c", "") == 0)
                 {
                     // Configuration found
-                    bus_name = v.second.get("bus-name", bus_name);
-                    node_port = v.second.get("node-port", node_port);
+                    bus_name = v.second.get("bus", bus_name);
+                    i2c_bus_address = v.second.get("address", i2c_bus_address);
                     break;
                 }
             }
         }
-        _uart_connection.reset(new NosEngine::Uart::Uart(_hub, config.get("simulator.name", "generic_css_sim"), connection_string, bus_name));
-        _uart_connection->open(node_port);
-        sim_logger->info("Generic_cssHardwareModel::Generic_cssHardwareModel:  Now on UART bus name %s, port %d.", bus_name.c_str(), node_port);
+*/
+        _i2c_slave_connection = new I2CSlaveConnection(this, i2c_bus_address, connection_string, bus_name);
+        sim_logger->info("Generic_cssHardwareModel::Generic_cssHardwareModel:  Now on i2c bus name %s, address %d.", bus_name.c_str(), i2c_bus_address);
     
         // Configure protocol callback
-        _uart_connection->set_read_callback(std::bind(&Generic_cssHardwareModel::uart_read_callback, this, std::placeholders::_1, std::placeholders::_2));
+        //_uart_connection->set_read_callback(std::bind(&Generic_cssHardwareModel::uart_read_callback, this, std::placeholders::_1, std::placeholders::_2));
 
         // Get on the command bus
         std::string time_bus_name = "command";
@@ -63,7 +64,6 @@ namespace Nos3
         }
         _time_bus.reset(new NosEngine::Client::Bus(_hub, connection_string, time_bus_name));
         sim_logger->info("Generic_cssHardwareModel::Generic_cssHardwareModel:  Now on time bus named %s.", time_bus_name.c_str());
-        */
         /* Construction complete */
         sim_logger->info("Generic_cssHardwareModel::Generic_cssHardwareModel:  Construction complete.");
     }
@@ -81,15 +81,27 @@ namespace Nos3
         /* The bus will clean up the time node */
     }
 
+    void Generic_cssHardwareModel::run(void)
+    {
+        int i = 0;
+        boost::shared_ptr<SimIDataPoint> dp;
+        while(_keep_running)
+        {
+            sim_logger->info("Generic_cssHardwareModel::run:  Loop count %d, time %f", i++,
+                _absolute_start_time + (double(_time_bus->get_time() * _sim_microseconds_per_tick)) / 1000000.0);
+            dp = _generic_css_dp->get_data_point();
+            sleep(5);
+        }
+    }
 
     /* Automagically set up by the base class to be called */
     void Generic_cssHardwareModel::command_callback(NosEngine::Common::Message msg)
     {
-        /* Get the data out of the message */
+        // Get the data out of the message
         NosEngine::Common::DataBufferOverlay dbf(const_cast<NosEngine::Utility::Buffer&>(msg.buffer));
         sim_logger->info("Generic_cssHardwareModel::command_callback:  Received command: %s.", dbf.data);
 
-        /* Do something with the data */
+        // Do something with the data
         std::string command = dbf.data;
         std::string response = "Generic_cssHardwareModel::command_callback:  INVALID COMMAND! (Try HELP)";
         boost::to_upper(command);
@@ -127,66 +139,70 @@ namespace Nos3
             _keep_running = false;
             response = "Generic_cssHardwareModel::command_callback:  Stopping";
         }
-        /* TODO: Add anything additional commands here */
+        else
+        {
+            //response = handle_command(command);
+        }
 
-        /* Send a reply */
+        // Send a reply
         sim_logger->info("Generic_cssHardwareModel::command_callback:  Sending reply: %s.", response.c_str());
         _command_node->send_reply_message_async(msg, response.size(), response.c_str());
     }
 
 
     /* Custom function to prepare the Generic_css HK telemetry */
+/*
     void Generic_cssHardwareModel::create_generic_css_hk(std::vector<uint8_t>& out_data)
     {
-        /* Prepare data size */
+        // Prepare data size
         out_data.resize(16, 0x00);
 
-        /* Streaming data header - 0xDEAD */
+        // Streaming data header - 0xDEAD
         out_data[0] = 0xDE;
         out_data[1] = 0xAD;
         
-        /* Sequence count */
+        // Sequence count
         out_data[2] = (_count >> 24) & 0x000000FF; 
         out_data[3] = (_count >> 16) & 0x000000FF; 
         out_data[4] = (_count >>  8) & 0x000000FF; 
         out_data[5] =  _count & 0x000000FF;
         
-        /* Configuration */
+        // Configuration
         out_data[6] = (_config >> 24) & 0x000000FF; 
         out_data[7] = (_config >> 16) & 0x000000FF; 
         out_data[8] = (_config >>  8) & 0x000000FF; 
         out_data[9] =  _config & 0x000000FF;
 
-        /* Device Status */
+        // Device Status
         out_data[10] = (_status >> 24) & 0x000000FF; 
         out_data[11] = (_status >> 16) & 0x000000FF; 
         out_data[12] = (_status >>  8) & 0x000000FF; 
         out_data[13] =  _status & 0x000000FF;
 
-        /* Streaming data trailer - 0xBEEF */
+        // Streaming data trailer - 0xBEEF
         out_data[14] = 0xBE;
         out_data[15] = 0xEF;
     }
-
-
-    /* Custom function to prepare the Generic_css Data */
+*/
+/*
+    // Custom function to prepare the Generic_css Data
     void Generic_cssHardwareModel::create_generic_css_data(std::vector<uint8_t>& out_data)
     {
         boost::shared_ptr<Generic_cssDataPoint> data_point = boost::dynamic_pointer_cast<Generic_cssDataPoint>(_generic_css_dp->get_data_point());
 
-        /* Prepare data size */
+        // Prepare data size
         out_data.resize(14, 0x00);
 
-        /* Streaming data header - 0xDEAD */
+        // Streaming data header - 0xDEAD
         out_data[0] = 0xDE;
         out_data[1] = 0xAD;
         
-        /* Sequence count */
+        // Sequence count
         out_data[2] = (_count >> 24) & 0x000000FF; 
         out_data[3] = (_count >> 16) & 0x000000FF; 
         out_data[4] = (_count >>  8) & 0x000000FF; 
         out_data[5] =  _count & 0x000000FF;
-        
+*/
         /* 
         ** Payload 
         ** 
@@ -198,6 +214,7 @@ namespace Nos3
         ** Scale each of the x, y, z (which are in the range [-1.0, 1.0]) by 32767, 
         **   and add 32768 so that the result fits in a uint16
         */
+/*
         uint16_t x   = (uint16_t)(data_point->get_generic_css_data_x()*32767.0 + 32768.0);
         out_data[6]  = (x >> 8) & 0x00FF;
         out_data[7]  =  x       & 0x00FF;
@@ -208,11 +225,11 @@ namespace Nos3
         out_data[10] = (z >> 8) & 0x00FF;
         out_data[11] =  z       & 0x00FF;
 
-        /* Streaming data trailer - 0xBEEF */
+        // Streaming data trailer - 0xBEEF
         out_data[12] = 0xBE;
         out_data[13] = 0xEF;
     }
-
+*/
 
     /* Protocol callback */
     /*

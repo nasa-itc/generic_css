@@ -41,11 +41,11 @@ static CFE_EVS_BinFilter_t  GENERIC_CSS_EventFilters[] =
     {GENERIC_CSS_DEVICE_TLM_ERR_EID,     0x0000},
     {GENERIC_CSS_REQ_HK_ERR_EID,         0x0000},
     {GENERIC_CSS_REQ_DATA_ERR_EID,       0x0000},
-    {GENERIC_CSS_UART_INIT_ERR_EID,      0x0000},
-    {GENERIC_CSS_UART_CLOSE_ERR_EID,     0x0000},
-    {GENERIC_CSS_UART_READ_ERR_EID,      0x0000},
-    {GENERIC_CSS_UART_WRITE_ERR_EID,     0x0000},
-    {GENERIC_CSS_UART_TIMEOUT_ERR_EID,   0x0000},
+    {GENERIC_CSS_I2C_INIT_ERR_EID,      0x0000},
+    {GENERIC_CSS_I2C_CLOSE_ERR_EID,     0x0000},
+    {GENERIC_CSS_I2C_READ_ERR_EID,      0x0000},
+    {GENERIC_CSS_I2C_WRITE_ERR_EID,     0x0000},
+    {GENERIC_CSS_I2C_TIMEOUT_ERR_EID,   0x0000},
     /* TODO: Add additional event IDs (EID) to the table as created */
 };
 
@@ -257,7 +257,7 @@ void GENERIC_CSS_ProcessCommandPacket(void)
         ** Ground Commands with command codes fall under the GENERIC_CSS_CMD_MID (Message ID)
         */
         case GENERIC_CSS_CMD_MID:
-            //GENERIC_CSS_ProcessGroundCommand();
+            GENERIC_CSS_ProcessGroundCommand();
             break;
 
         /*
@@ -403,7 +403,7 @@ void GENERIC_CSS_ProcessTelemetryRequest(void)
     {
         case GENERIC_CSS_REQ_HK_TLM:
             //GENERIC_CSS_ReportHousekeeping();
-            break;
+            //break;
 
         case GENERIC_CSS_REQ_DATA_TLM:
             GENERIC_CSS_ReportDeviceTelemetry();
@@ -465,9 +465,12 @@ void GENERIC_CSS_ReportDeviceTelemetry(void)
     /* Check that device is enabled */
     if (GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled == GENERIC_CSS_DEVICE_ENABLED)
     {
-        status = GENERIC_CSS_RequestData(GENERIC_CSS_AppData.Generic_cssUart.handle, (GENERIC_CSS_Device_Data_tlm_t*) &GENERIC_CSS_AppData.DevicePkt.Generic_css);
+        status = GENERIC_CSS_RequestData(GENERIC_CSS_AppData.Generic_cssI2c.handle, 
+            (GENERIC_CSS_Device_Data_tlm_t*) &GENERIC_CSS_AppData.DevicePkt.Generic_css,
+            (GENERIC_CSS_Device_HK_tlm_t*) &GENERIC_CSS_AppData.HkTelemetryPkt.DeviceHK);
         if (status == OS_SUCCESS)
         {
+            // QUESTION: Why does reporting device telemetry increment the number of devices?
             GENERIC_CSS_AppData.HkTelemetryPkt.DeviceCount++;
             /* Time stamp and publish data telemetry */
             CFE_SB_TimeStampMsg((CFE_SB_Msg_t *) &GENERIC_CSS_AppData.DevicePkt);
@@ -514,14 +517,14 @@ void GENERIC_CSS_Enable(void)
         ** TODO: Make specific to your application depending on protocol in use
         ** Note that other components provide examples for the different protocols available
         */ 
-        GENERIC_CSS_AppData.Generic_cssUart.deviceString = GENERIC_CSS_CFG_STRING;
-        GENERIC_CSS_AppData.Generic_cssUart.handle = GENERIC_CSS_CFG_HANDLE;
-        GENERIC_CSS_AppData.Generic_cssUart.isOpen = PORT_CLOSED;
-        GENERIC_CSS_AppData.Generic_cssUart.baud = GENERIC_CSS_CFG_BAUDRATE_HZ;
-        GENERIC_CSS_AppData.Generic_cssUart.access_option = uart_access_flag_RDWR;
+        GENERIC_CSS_AppData.Generic_cssI2c.handle = GENERIC_CSS_CFG_HANDLE;
+        GENERIC_CSS_AppData.Generic_cssI2c.isOpen = PORT_CLOSED; // Question: should this be open?
+        GENERIC_CSS_AppData.Generic_cssI2c.speed = GENERIC_CSS_CFG_BAUDRATE_HZ;
+        GENERIC_CSS_AppData.Generic_cssI2c.addr = GENERIC_CSS_I2C_ADDRESS;
 
         /* Open device specific protocols */
-        status = uart_init_port(&GENERIC_CSS_AppData.Generic_cssUart);
+        // Question: css is slave, not master, therefore does not need to init?
+        //status = i2c_master_init(&GENERIC_CSS_AppData.Generic_cssI2c);
         if (status == OS_SUCCESS)
         {
             GENERIC_CSS_AppData.HkTelemetryPkt.DeviceCount++;
@@ -531,7 +534,7 @@ void GENERIC_CSS_Enable(void)
         else
         {
             GENERIC_CSS_AppData.HkTelemetryPkt.DeviceErrorCount++;
-            CFE_EVS_SendEvent(GENERIC_CSS_UART_INIT_ERR_EID, CFE_EVS_ERROR, "GENERIC_CSS: UART port initialization error %d", status);
+            CFE_EVS_SendEvent(GENERIC_CSS_I2C_INIT_ERR_EID, CFE_EVS_ERROR, "GENERIC_CSS: I2C port initialization error %d", status);
         }
     }
     else
@@ -555,7 +558,8 @@ void GENERIC_CSS_Disable(void)
     if (GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled == GENERIC_CSS_DEVICE_ENABLED)
     {
         /* Open device specific protocols */
-        status = uart_close_port(GENERIC_CSS_AppData.Generic_cssUart.handle);
+        //status = uart_close_port(GENERIC_CSS_AppData.Generic_cssUart.handle);
+        // Question: should we set i2c device isOpen property to closed here?
         if (status == OS_SUCCESS)
         {
             GENERIC_CSS_AppData.HkTelemetryPkt.DeviceCount++;
@@ -565,7 +569,7 @@ void GENERIC_CSS_Disable(void)
         else
         {
             GENERIC_CSS_AppData.HkTelemetryPkt.DeviceErrorCount++;
-            CFE_EVS_SendEvent(GENERIC_CSS_UART_CLOSE_ERR_EID, CFE_EVS_ERROR, "GENERIC_CSS: UART port close error %d", status);
+            CFE_EVS_SendEvent(GENERIC_CSS_I2C_CLOSE_ERR_EID, CFE_EVS_ERROR, "GENERIC_CSS: I2C port close error %d", status);
         }
     }
     else

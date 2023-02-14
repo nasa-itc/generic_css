@@ -12,8 +12,11 @@ namespace Nos3
         /* Do calculations based on provided data */
         _generic_css_data_is_valid = true;
         _generic_css_data[0] = count * 0.001;
-        _generic_css_data[1] = count * 0.002;
-        _generic_css_data[2] = count * 0.003;
+        _generic_css_data[1] = count * 0.001;
+        _generic_css_data[2] = count * 0.001;
+        _generic_css_data[3] = count * 0.001;
+        _generic_css_data[4] = count * 0.001;
+        _generic_css_data[5] = count * 0.001;
     }
 
     Generic_cssDataPoint::Generic_cssDataPoint(int16_t spacecraft, const boost::shared_ptr<Sim42DataPoint> dp)
@@ -25,6 +28,9 @@ namespace Nos3
         _generic_css_data[0] = 0.0;
         _generic_css_data[1] = 0.0;
         _generic_css_data[2] = 0.0;
+        _generic_css_data[3] = 0.0;
+        _generic_css_data[4] = 0.0;
+        _generic_css_data[5] = 0.0;
 
         /*
         ** Declare 42 telemetry string prefix
@@ -55,10 +61,16 @@ namespace Nos3
                     _generic_css_data[1] = std::stod(s);
                     iss >> s;
                     _generic_css_data[2] = std::stod(s);
+                    iss >> s;
+                    _generic_css_data[3] = std::stod(s);
+                    iss >> s;
+                    _generic_css_data[4] = std::stod(s);
+                    iss >> s;
+                    _generic_css_data[5] = std::stod(s);
                     /* Mark data as valid */
                     _generic_css_data_is_valid = true;
                     /* Debug print */
-                    sim_logger->trace("Generic_cssDataPoint::Generic_cssDataPoint:  Parsed svb = %f %f %f", _generic_css_data[0], _generic_css_data[1], _generic_css_data[2]);
+                    sim_logger->trace("Generic_cssDataPoint::Generic_cssDataPoint:  Parsed svb = %f %f %f %f %f %f", _generic_css_data[0], _generic_css_data[1], _generic_css_data[2], _generic_css_data[3], _generic_css_data[4], _generic_css_data[5]);
                 }
             }
         } 
@@ -85,7 +97,13 @@ namespace Nos3
            << " "
            << _generic_css_data[1]
            << " "
-           << _generic_css_data[2];
+           << _generic_css_data[2]
+           << " "
+           << _generic_css_data[3]
+           << " "
+           << _generic_css_data[4]
+           << " "
+           << _generic_css_data[5];
 
         return ss.str();
     }

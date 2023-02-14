@@ -18,9 +18,9 @@
     /* Notes: 
     **   NOS3 uart requires matching handle and bus number
     */
-    #define GENERIC_CSS_CFG_STRING           "i2c_3"
-    #define GENERIC_CSS_CFG_HANDLE           3 
-    #define GENERIC_CSS_CFG_BAUDRATE_HZ      1000000
+    #define GENERIC_CSS_CFG_STRING           "i2c_2"
+    #define GENERIC_CSS_CFG_HANDLE           2 
+    #define GENERIC_CSS_CFG_BAUDRATE_HZ      10000
     #define GENERIC_CSS_CFG_MS_TIMEOUT       250            /* Max 255 */
     /* Note: Debug flag disabled (commented out) by default */
     //#define GENERIC_CSS_CFG_DEBUG
