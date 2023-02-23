@@ -15,6 +15,7 @@ namespace Nos3
             config.get("simulator.hardware-model.data-provider.port", 4227) );
 
         _sc = config.get("simulator.hardware-model.data-provider.spacecraft", 0);
+        _scale_factor = config.get("simulator.hardware-model.data-provider.42-css-scale-factor", 1.0);
     }
 
     boost::shared_ptr<SimIDataPoint> Generic_css42DataProvider::get_data_point(void) const
@@ -25,7 +26,7 @@ namespace Nos3
         const boost::shared_ptr<Sim42DataPoint> dp42 = boost::dynamic_pointer_cast<Sim42DataPoint>(SimData42SocketProvider::get_data_point());
 
         /* Prepare the specific data */
-        SimIDataPoint *dp = new Generic_cssDataPoint(_sc, dp42);
+        SimIDataPoint *dp = new Generic_cssDataPoint(_scale_factor, _sc, dp42);
 
         return boost::shared_ptr<SimIDataPoint>(dp);
     }

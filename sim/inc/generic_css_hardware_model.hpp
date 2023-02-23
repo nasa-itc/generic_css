@@ -40,11 +40,7 @@ namespace Nos3
     private:
         /* Private helper methods */
         void run(void);
-        void create_generic_css_hk(std::vector<uint8_t>& out_data); 
-        void create_generic_css_data(std::vector<uint8_t>& out_data); 
-        //std::uint8_t determine_i2c_response_for_request(const std::vector<uint8_t>& in_data);
         void command_callback(NosEngine::Common::Message msg); /* Handle backdoor commands and time tick to the simulator */
-        //std::string handle_command(std::string command);
         /* Private data members */
         class I2CSlaveConnection*                           _i2c_slave_connection; /* TODO: Change if your protocol bus is different (e.g. SPI, I2C, etc.) */
         std::unique_ptr<NosEngine::Client::Bus>             _time_bus; /* Standard */

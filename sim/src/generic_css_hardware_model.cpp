@@ -13,7 +13,7 @@ namespace Nos3
         sim_logger->info("Generic_cssHardwareModel::Generic_cssHardwareModel:  NOS Engine connection string: %s.", connection_string.c_str());
 
         /* Get a data provider */
-        std::string dp_name = config.get("simulator.hardware-model.data-provider.type", "GENERIC_CSS_PROVIDER");
+        std::string dp_name = config.get("simulator.hardware-model.data-provider.type", "GENERIC_CSS_42_PROVIDER");
         _generic_css_dp = SimDataProviderFactory::Instance().Create(dp_name, config);
         sim_logger->info("Generic_cssHardwareModel::Generic_cssHardwareModel:  Data provider %s created.", dp_name.c_str());
 
@@ -22,29 +22,12 @@ namespace Nos3
        
         std::string bus_name = "i2c_2";
         int i2c_bus_address = 64; // 0x40
-/*
-        if (config.get_child_optional("simulator.hardware-model.i2c")) 
-        {
-            // Loop through the connections for hardware model
-            BOOST_FOREACH(const boost::property_tree::ptree::value_type &v, config.get_child("simulator.hardware-model.i2c"))
-            {
-                // v.second is the child tree (v.first is the name of the child)
-                if (v.second.get("i2c", "") == 0)
-                {
-                    // Configuration found
-                    bus_name = v.second.get("bus", bus_name);
-                    i2c_bus_address = v.second.get("address", i2c_bus_address);
-                    break;
-                }
-            }
-        }
-*/
+        bus_name = config.get("simulator.hardware-model.i2c.bus", "i2c_2");
+        i2c_bus_address = config.get("simulator.hardware-model.i2c.address", 64);
+
         _i2c_slave_connection = new I2CSlaveConnection(this, i2c_bus_address, connection_string, bus_name);
         sim_logger->info("Generic_cssHardwareModel::Generic_cssHardwareModel:  Now on i2c bus name %s, address %d.", bus_name.c_str(), i2c_bus_address);
     
-        // Configure protocol callback
-        //_uart_connection->set_read_callback(std::bind(&Generic_cssHardwareModel::uart_read_callback, this, std::placeholders::_1, std::placeholders::_2));
-
         // Get on the command bus
         std::string time_bus_name = "command";
         if (config.get_child_optional("hardware-model.connections")) 
@@ -72,7 +55,6 @@ namespace Nos3
     Generic_cssHardwareModel::~Generic_cssHardwareModel(void)
     {        
         /* Close the protocol bus */
-        //_uart_connection->close();
 
         /* Clean up the data provider */
         delete _generic_css_dp;
@@ -90,6 +72,8 @@ namespace Nos3
             sim_logger->info("Generic_cssHardwareModel::run:  Loop count %d, time %f", i++,
                 _absolute_start_time + (double(_time_bus->get_time() * _sim_microseconds_per_tick)) / 1000000.0);
             dp = _generic_css_dp->get_data_point();
+            sim_logger->info("Generic_cssHardwareModel::run:  %s", dp->to_string().c_str());
+
             sleep(5);
         }
     }
@@ -139,204 +123,37 @@ namespace Nos3
             _keep_running = false;
             response = "Generic_cssHardwareModel::command_callback:  Stopping";
         }
-        else
-        {
-            //response = handle_command(command);
-        }
 
         // Send a reply
         sim_logger->info("Generic_cssHardwareModel::command_callback:  Sending reply: %s.", response.c_str());
         _command_node->send_reply_message_async(msg, response.size(), response.c_str());
     }
 
-
-    /* Custom function to prepare the Generic_css HK telemetry */
-/*
-    void Generic_cssHardwareModel::create_generic_css_hk(std::vector<uint8_t>& out_data)
+    I2CSlaveConnection::I2CSlaveConnection(Generic_cssHardwareModel* hm,
+        int bus_address, std::string connection_string, std::string bus_name)
+        : NosEngine::I2C::I2CSlave(bus_address, connection_string, bus_name)
     {
-        // Prepare data size
-        out_data.resize(16, 0x00);
-
-        // Streaming data header - 0xDEAD
-        out_data[0] = 0xDE;
-        out_data[1] = 0xAD;
-        
-        // Sequence count
-        out_data[2] = (_count >> 24) & 0x000000FF; 
-        out_data[3] = (_count >> 16) & 0x000000FF; 
-        out_data[4] = (_count >>  8) & 0x000000FF; 
-        out_data[5] =  _count & 0x000000FF;
-        
-        // Configuration
-        out_data[6] = (_config >> 24) & 0x000000FF; 
-        out_data[7] = (_config >> 16) & 0x000000FF; 
-        out_data[8] = (_config >>  8) & 0x000000FF; 
-        out_data[9] =  _config & 0x000000FF;
-
-        // Device Status
-        out_data[10] = (_status >> 24) & 0x000000FF; 
-        out_data[11] = (_status >> 16) & 0x000000FF; 
-        out_data[12] = (_status >>  8) & 0x000000FF; 
-        out_data[13] =  _status & 0x000000FF;
-
-        // Streaming data trailer - 0xBEEF
-        out_data[14] = 0xBE;
-        out_data[15] = 0xEF;
+        _hardware_model = hm;
     }
-*/
-/*
-    // Custom function to prepare the Generic_css Data
-    void Generic_cssHardwareModel::create_generic_css_data(std::vector<uint8_t>& out_data)
+
+    size_t I2CSlaveConnection::i2c_read(uint8_t *rbuf, size_t rlen)
     {
-        boost::shared_ptr<Generic_cssDataPoint> data_point = boost::dynamic_pointer_cast<Generic_cssDataPoint>(_generic_css_dp->get_data_point());
-
-        // Prepare data size
-        out_data.resize(14, 0x00);
-
-        // Streaming data header - 0xDEAD
-        out_data[0] = 0xDE;
-        out_data[1] = 0xAD;
-        
-        // Sequence count
-        out_data[2] = (_count >> 24) & 0x000000FF; 
-        out_data[3] = (_count >> 16) & 0x000000FF; 
-        out_data[4] = (_count >>  8) & 0x000000FF; 
-        out_data[5] =  _count & 0x000000FF;
-*/
-        /* 
-        ** Payload 
-        ** 
-        ** Device is big engian (most significant byte first)
-        ** Assuming data is valid regardless of dynamic / environmental data
-        ** Floating poing numbers are extremely problematic 
-        **   (https://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html)
-        ** Most hardware transmits some type of unsigned integer (e.g. from an ADC), so that's what we've done
-        ** Scale each of the x, y, z (which are in the range [-1.0, 1.0]) by 32767, 
-        **   and add 32768 so that the result fits in a uint16
-        */
-/*
-        uint16_t x   = (uint16_t)(data_point->get_generic_css_data_x()*32767.0 + 32768.0);
-        out_data[6]  = (x >> 8) & 0x00FF;
-        out_data[7]  =  x       & 0x00FF;
-        uint16_t y   = (uint16_t)(data_point->get_generic_css_data_y()*32767.0 + 32768.0);
-        out_data[8]  = (y >> 8) & 0x00FF;
-        out_data[9]  =  y       & 0x00FF;
-        uint16_t z   = (uint16_t)(data_point->get_generic_css_data_z()*32767.0 + 32768.0);
-        out_data[10] = (z >> 8) & 0x00FF;
-        out_data[11] =  z       & 0x00FF;
-
-        // Streaming data trailer - 0xBEEF
-        out_data[12] = 0xBE;
-        out_data[13] = 0xEF;
+        size_t num_read;
+        sim_logger->debug("i2c_read: 0x%02x", _i2c_out_data); // log data
+        if(rlen <= 1)
+        {
+            rbuf[0] = _i2c_out_data;
+            num_read = 1;
+        }
+        return num_read;
     }
-*/
 
-    /* Protocol callback */
-    /*
-    void Generic_cssHardwareModel::uart_read_callback(const uint8_t *buf, size_t len)
+    size_t I2CSlaveConnection::i2c_write(const uint8_t *wbuf, size_t wlen)
     {
-        std::vector<uint8_t> out_data; 
-        std::uint8_t valid = GENERIC_CSS_SIM_SUCCESS;
-        
-        std::uint32_t rcv_config;
-
-        // Retrieve data and log in man readable format
-        std::vector<uint8_t> in_data(buf, buf + len);
-        sim_logger->debug("Generic_cssHardwareModel::uart_read_callback:  REQUEST %s",
-            SimIHardwareModel::uint8_vector_to_hex_string(in_data).c_str());
-
-        // Check simulator is enabled
-        if (_enabled != GENERIC_CSS_SIM_SUCCESS)
-        {
-            sim_logger->debug("Generic_cssHardwareModel::uart_read_callback:  Generic_css sim disabled!");
-            valid = GENERIC_CSS_SIM_ERROR;
-        }
-        else
-        {
-            // Check if message is incorrect size
-            if (in_data.size() != 9)
-            {
-                sim_logger->debug("Generic_cssHardwareModel::uart_read_callback:  Invalid command size of %d received!", in_data.size());
-                valid = GENERIC_CSS_SIM_ERROR;
-            }
-            else
-            {
-                // Check header - 0xDEAD
-                if ((in_data[0] != 0xDE) || (in_data[1] !=0xAD))
-                {
-                    sim_logger->debug("Generic_cssHardwareModel::uart_read_callback:  Header incorrect!");
-                    valid = GENERIC_CSS_SIM_ERROR;
-                }
-                else
-                {
-                    // Check trailer - 0xBEEF
-                    if ((in_data[7] != 0xBE) || (in_data[8] !=0xEF))
-                    {
-                        sim_logger->debug("Generic_cssHardwareModel::uart_read_callback:  Trailer incorrect!");
-                        valid = GENERIC_CSS_SIM_ERROR;
-                    }
-                    else
-                    {
-                        // Increment count as valid command format received
-                        _count++;
-                    }
-                }
-            }
-
-            if (valid == GENERIC_CSS_SIM_SUCCESS)
-            {   
-                // Process command
-                switch (in_data[2])
-                {
-                    case 0:
-                        // NOOP
-                        sim_logger->debug("Generic_cssHardwareModel::uart_read_callback:  NOOP command received!");
-                        break;
-
-                case 1:
-                        // Request HK
-                        sim_logger->debug("Generic_cssHardwareModel::uart_read_callback:  Send HK command received!");
-                        create_generic_css_hk(out_data);
-                        break;
-
-                    case 2:
-                        // Request data
-                        sim_logger->debug("Generic_cssHardwareModel::uart_read_callback:  Send data command received!");
-                        create_generic_css_data(out_data);
-                        break;
-
-                    case 3:
-                        // Configuration
-                        sim_logger->debug("Generic_cssHardwareModel::uart_read_callback:  Configuration command received!");
-                        _config  = in_data[3] << 24;
-                        _config |= in_data[4] << 16;
-                        _config |= in_data[5] << 8;
-                        _config |= in_data[6];
-                        break;
-                    
-                    default:
-                        // Unused command code
-                        valid = GENERIC_CSS_SIM_ERROR;
-                        sim_logger->debug("Generic_cssHardwareModel::uart_read_callback:  Unused command %d received!", in_data[2]);
-                        break;
-                }
-            }
-        }
-
-        // Increment count and echo command since format valid
-        if (valid == GENERIC_CSS_SIM_SUCCESS)
-        {
-            _count++;
-            _uart_connection->write(&in_data[0], in_data.size());
-
-            // Send response if existing
-            if (out_data.size() > 0)
-            {
-                sim_logger->debug("Generic_cssHardwareModel::uart_read_callback:  REPLY %s",
-                    SimIHardwareModel::uint8_vector_to_hex_string(out_data).c_str());
-                _uart_connection->write(&out_data[0], out_data.size());
-            }
-        }
+        std::vector<uint8_t> in_data(wbuf, wbuf + wlen);
+        sim_logger->debug("i2c_write: %s",
+            SimIHardwareModel::uint8_vector_to_hex_string(in_data).c_str()); // log data
+        //_i2c_out_data = _hardware_model->determine_i2c_response_for_request(in_data);
+        return wlen;
     }
-    */
 }

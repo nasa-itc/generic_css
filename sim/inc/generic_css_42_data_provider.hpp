@@ -24,6 +24,7 @@ namespace Nos3
         Generic_css42DataProvider& operator=(const Generic_css42DataProvider&) {};
 
         int16_t _sc;  /* Which spacecraft number to parse out of 42 data */
+        double _scale_factor; // Corresponds to the CSS Scale Factor from 42
     };
 }
 

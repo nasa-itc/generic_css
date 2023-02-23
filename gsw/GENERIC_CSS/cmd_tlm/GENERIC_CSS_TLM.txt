@@ -24,18 +24,4 @@ TELEMETRY GENERIC_CSS GENERIC_CSS_DATA_TLM LITTLE_ENDIAN "GENERIC_CSS_Device_tlm
   APPEND_ITEM    CCSDS_SUBSECS        16 UINT         "CCSDS Telemetry Secondary Header (subseconds)"
   # GENERIC_CSS_Device_Data_tlm_t
   APPEND_ITEM    DEVICE_COUNTER       32 UINT         "Reported Device Command Counter"
-  APPEND_ITEM    RAW_GENERIC_CSS_X         16 UINT         "Raw generic_css data x component (1-65535)"
-  APPEND_ITEM    RAW_GENERIC_CSS_Y         16 UINT         "Raw generic_css data y component (1-65535)"
-  APPEND_ITEM    RAW_GENERIC_CSS_Z         16 UINT         "Raw generic_css data z component (1-65535)"
-  APPEND_ITEM    GENERIC_CSS_X              0 DERIVED      "Generic_css data unit vector x component (-1.0 to 1.0)"
-    GENERIC_READ_CONVERSION_START FLOAT 32
-      (packet.read("RAW_GENERIC_CSS_X") - 32768.0)/32767.0
-    GENERIC_READ_CONVERSION_END
-  APPEND_ITEM    GENERIC_CSS_Y              0 DERIVED      "Generic_css data unit vector y component (-1.0 to 1.0)"
-    GENERIC_READ_CONVERSION_START FLOAT 32
-      (packet.read("RAW_GENERIC_CSS_Y") - 32768.0)/32767.0
-    GENERIC_READ_CONVERSION_END
-  APPEND_ITEM    GENERIC_CSS_Z              0 DERIVED      "Generic_css data unit vector z component (-1.0 to 1.0)"
-    GENERIC_READ_CONVERSION_START FLOAT 32
-      (packet.read("RAW_GENERIC_CSS_Z") - 32768.0)/32767.0
-    GENERIC_READ_CONVERSION_END
+  APPEND_ITEM    GENERIC_CSS_DATA     96 BLOCK        "Raw generic_css data (1-65535)"
