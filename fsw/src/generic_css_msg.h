@@ -15,18 +15,15 @@
 
 /*
 ** Ground Command Codes
-** TODO: Add additional commands required by the specific component
 */
 #define GENERIC_CSS_NOOP_CC                 0
 #define GENERIC_CSS_RESET_COUNTERS_CC       1
 #define GENERIC_CSS_ENABLE_CC               2
 #define GENERIC_CSS_DISABLE_CC              3
-#define GENERIC_CSS_CONFIG_CC               4
 
 
 /* 
 ** Telemetry Request Command Codes
-** TODO: Add additional commands required by the specific component
 */
 #define GENERIC_CSS_REQ_HK_TLM              0
 #define GENERIC_CSS_REQ_DATA_TLM            1
@@ -41,17 +38,6 @@ typedef struct
     uint8    CmdHeader[CFE_SB_CMD_HDR_SIZE];
 
 } GENERIC_CSS_NoArgs_cmd_t;
-
-
-/*
-** GENERIC_CSS write configuration command
-*/
-typedef struct
-{
-    uint8    CmdHeader[CFE_SB_CMD_HDR_SIZE];
-    uint32   DeviceCfg;
-
-} GENERIC_CSS_Config_cmd_t;
 
 
 /*
@@ -76,12 +62,7 @@ typedef struct
     uint8   CommandCount;
     uint8   DeviceErrorCount;
     uint8   DeviceCount;
-  
-    /*
-    ** TODO: Edit and add specific telemetry values to this struct
-    */
     uint8   DeviceEnabled;
-    GENERIC_CSS_Device_HK_tlm_t DeviceHK;
 
 } OS_PACK GENERIC_CSS_Hk_tlm_t;
 #define GENERIC_CSS_HK_TLM_LNGTH sizeof ( GENERIC_CSS_Hk_tlm_t )

@@ -31,9 +31,7 @@
 #define GENERIC_CSS_DISABLE_ERR_EID           18
 
 /* Device specific command event IDs */
-#define GENERIC_CSS_CMD_CONFIG_INF_EID        20
-#define GENERIC_CSS_CONFIG_INF_EID            21
-#define GENERIC_CSS_CONFIG_ERR_EID            22
+/* None */
 
 /* Standard telemetry event IDs */
 #define GENERIC_CSS_DEVICE_TLM_ERR_EID        30
@@ -44,9 +42,6 @@
 
 /* Hardware protocol event IDs */
 #define GENERIC_CSS_I2C_INIT_ERR_EID         40
-#define GENERIC_CSS_I2C_CLOSE_ERR_EID        41
-#define GENERIC_CSS_I2C_READ_ERR_EID         42
-#define GENERIC_CSS_I2C_WRITE_ERR_EID        43
-#define GENERIC_CSS_I2C_TIMEOUT_ERR_EID      44
+#define GENERIC_CSS_I2C_READ_ERR_EID         41
 
 #endif /* _GENERIC_CSS_EVENTS_H_ */

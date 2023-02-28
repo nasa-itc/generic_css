@@ -10,7 +10,7 @@ int
 main(int argc, char *argv[])
 {
     /* This is the ONLY simulator specific line! */
-    std::string simulator_name = "generic-css-sim"; 
+    std::string simulator_name = "generic_css_sim"; 
 
     /* Determine the configuration and run the simulator */
     Nos3::SimConfig sc(argc, argv);

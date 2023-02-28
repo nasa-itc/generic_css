@@ -23,7 +23,7 @@
     #define GENERIC_CSS_CFG_BAUDRATE_HZ      1000
     #define GENERIC_CSS_CFG_MS_TIMEOUT       250            /* Max 255 */
     /* Note: Debug flag disabled (commented out) by default */
-    //#define GENERIC_CSS_CFG_DEBUG
+    #define GENERIC_CSS_CFG_DEBUG
 #endif
 
 #endif /* _GENERIC_CSS_PLATFORM_CFG_H_ */
