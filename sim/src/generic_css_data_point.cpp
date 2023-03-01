@@ -28,7 +28,7 @@ namespace Nos3
 
         /* Do calculations based on provided data */
         std::vector<bool>   valid(6, true);
-        std::vector<double> illum(6, 0.0);
+        std::vector<float> illum(6, 0.0);
         _generic_css_data = illum;
         _generic_css_data[0] = count * 0.001;
         _generic_css_data[1] = count * 0.001;
@@ -44,7 +44,7 @@ namespace Nos3
 
         /* Initialize data */
         std::vector<bool>   valid(6, false);
-        std::vector<double> illum(6, 0.0);
+        std::vector<float> illum(6, 0.0);
         _generic_css_data = illum;
 
         /*
@@ -62,6 +62,10 @@ namespace Nos3
         {
             for (int i = 0; i < lines.size(); i++) 
             {
+                /* Debugging print
+                sim_logger->debug("Line[%d] = %s", i, lines[i].c_str());
+                */ 
+
                 // Compare prefix
                 if (lines[i].compare(0, MSsize, MatchString.str()) == 0) 
                 {
@@ -72,29 +76,33 @@ namespace Nos3
                         std::string param(lines[i].substr(rb+2, 5));
                         size_t equal = lines[i].find_first_of("=");
                         std::string value(lines[i].substr(equal+1, lines[i].size()-equal-1));
-                        if (param.compare("Valid") == 0) {
+                        if (param.compare("Valid") == 0) 
+                        {
                             int flag = std::stoi(value);
-                            if (flag != 0) {
+                            if (flag != 0) 
+                            {
                                 valid[index] = true;
-                            } else {
+                            } else 
+                            {
                                 valid[index] = false;
+                                _generic_css_data[index] = 0.0;
                             }
-                        } else if (param.compare("Illum") == 0) {
-                            _generic_css_data[index] = std::stod(value)/scaleFactor;
+                        } else if (param.compare("Illum") == 0) 
+                        {
+                            _generic_css_data[index] = std::stof(value) / scaleFactor;
+                            /* Debugging print
+                            sim_logger->debug("  css[%d] stof(value) = %f ", index, std::stof(value));
+                            sim_logger->debug("  css[%d] stof(value) / scaleFactor = %f ", index, std::stof(value) / scaleFactor);
+                            */
                         }
                     }
-                }
-            }
-            for (int i = 0; i < numChannels; i++) {
-                if (!valid[i]) {
-                    _generic_css_data[i] = 0.0;
                 }
             }
         } 
         catch(const std::exception& e) 
         {
-            // Force data to be set to known values
-            std::vector<double> illum(6, 8.0);
+            /* Force data to be set to known values */
+            std::vector<float> illum(6, 8.0);
             _generic_css_data = illum; 
             sim_logger->error("Generic_cssDataPoint::Generic_cssDataPoint:  Parsing exception %s", e.what());
         }

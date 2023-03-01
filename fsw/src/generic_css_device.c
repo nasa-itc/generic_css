@@ -12,22 +12,6 @@
 #include "generic_css_device.h"
 
 
-/* 
-** Generic read data from device
-*/
-int32_t GENERIC_CSS_ReadData(int32_t handle, uint8_t* read_data, uint8_t data_length)
-{
-    int32_t status = OS_SUCCESS;
-
-    status = i2c_master_transaction(handle, GENERIC_CSS_I2C_ADDRESS, NULL, 0, read_data, data_length, GENERIC_CSS_CFG_MS_TIMEOUT);
-    if (status != OS_SUCCESS)
-    {
-        status = OS_ERROR;
-    }
-
-    return status;
-}
-
 /*
 ** Request data command
 */
@@ -36,14 +20,14 @@ int32_t GENERIC_CSS_RequestData(int32_t handle, GENERIC_CSS_Device_Data_tlm_t* d
     int32_t status = OS_SUCCESS;
     uint8_t read_data[GENERIC_CSS_DEVICE_DATA_LNGTH] = {0};
 
-    status = GENERIC_CSS_ReadData(handle, read_data, sizeof(read_data));
+    status = i2c_master_transaction(handle, GENERIC_CSS_I2C_ADDRESS, NULL, 0, read_data, GENERIC_CSS_DEVICE_DATA_LNGTH, GENERIC_CSS_CFG_MS_TIMEOUT);
     if (status == OS_SUCCESS)
     {
         #ifdef GENERIC_CSS_CFG_DEBUG
-            OS_printf("  GENERIC_CSS_RequestData = ");
+            OS_printf("  GENERIC_CSS_RequestData = 0x");
             for (uint32_t i = 0; i < sizeof(read_data); i++)
             {
-                OS_printf("%02x", read_data[i]);
+                OS_printf("%02x, ", read_data[i]);
             }
             OS_printf("\n");
         #endif

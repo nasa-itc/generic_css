@@ -102,27 +102,33 @@ namespace Nos3
     void Generic_cssHardwareModel::create_generic_css_data(std::vector<uint8_t>& out_data)
     {
         boost::shared_ptr<Generic_cssDataPoint> data_point = boost::dynamic_pointer_cast<Generic_cssDataPoint>(_generic_css_dp->get_data_point());
-        std::vector<double> cssValues = data_point->getValues();
+        std::vector<float> cssValues = data_point->getValues();
 
         /* Prepare data size */
+        out_data.clear();
         out_data.resize(12, 0x00);
 
         sim_logger->debug("Generic_cssHardwareModel::create_generic_css_data:  Creating data, enabled=%d", _enabled);
         if (_enabled == GENERIC_CSS_SIM_SUCCESS) 
         {
-            out_data[0] = ((uint16_t) cssValues[0] & 0xFF00) >> 8;
-            out_data[1] = ((uint16_t) cssValues[0] & 0x00FF);
-            out_data[2] = ((uint16_t) cssValues[1] & 0xFF00) >> 8;
-            out_data[3] = ((uint16_t) cssValues[1] & 0x00FF);
-            out_data[4] = ((uint16_t) cssValues[2] & 0xFF00) >> 8;
-            out_data[5] = ((uint16_t) cssValues[2] & 0x00FF);
-            out_data[6] = ((uint16_t) cssValues[3] & 0xFF00) >> 8;
-            out_data[7] = ((uint16_t) cssValues[3] & 0x00FF);
-            out_data[8] = ((uint16_t) cssValues[4] & 0xFF00) >> 8;
-            out_data[9] = ((uint16_t) cssValues[4] & 0x00FF);
-            out_data[10] = ((uint16_t) cssValues[5] & 0xFF00) >> 8;
-            out_data[11] = ((uint16_t) cssValues[5] & 0x00FF);
-        }                
+            out_data[0] = ((uint16_t) (cssValues[0] * 1000) & 0xFF00) >> 8;
+            out_data[1] = ((uint16_t) (cssValues[0] * 1000) & 0x00FF);
+            out_data[2] = ((uint16_t) (cssValues[1] * 1000) & 0xFF00) >> 8;
+            out_data[3] = ((uint16_t) (cssValues[1] * 1000) & 0x00FF);
+            out_data[4] = ((uint16_t) (cssValues[2] * 1000) & 0xFF00) >> 8;
+            out_data[5] = ((uint16_t) (cssValues[2] * 1000) & 0x00FF);
+            out_data[6] = ((uint16_t) (cssValues[3] * 1000) & 0xFF00) >> 8;
+            out_data[7] = ((uint16_t) (cssValues[3] * 1000) & 0x00FF);
+            out_data[8] = ((uint16_t) (cssValues[4] * 1000) & 0xFF00) >> 8;
+            out_data[9] = ((uint16_t) (cssValues[4] * 1000) & 0x00FF);
+            out_data[10] = ((uint16_t) (cssValues[5] * 1000) & 0xFF00) >> 8;
+            out_data[11] = ((uint16_t) (cssValues[5] * 1000) & 0x00FF);
+
+            /* Debugging print
+            sim_logger->debug("  css[0] = %f", cssValues[0]);
+            sim_logger->debug("    Converted = 0x%02x, 0x%02x", out_data[0], out_data[1]);
+            */ 
+        }
     }
 
     I2CSlaveConnection::I2CSlaveConnection(Generic_cssHardwareModel* hm, 
@@ -138,7 +144,7 @@ namespace Nos3
         sim_logger->debug("i2c_read: %s", SimIHardwareModel::uint8_vector_to_hex_string(_i2c_out_data).c_str());
         for (int i = 0; i < rlen; i++) 
         {
-            if (rlen < 12)
+            if (i < sizeof(_i2c_out_data))
             {
                 rbuf[i] = _i2c_out_data[i];
             }

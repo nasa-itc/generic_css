@@ -19,10 +19,10 @@ TELEMETRY GENERIC_CSS GENERIC_CSS_DATA_TLM LITTLE_ENDIAN "GENERIC_CSS_Device_tlm
   APPEND_ITEM    CCSDS_SECONDS        32 UINT         "CCSDS Telemetry Secondary Header (seconds)"
   APPEND_ITEM    CCSDS_SUBSECS        16 UINT         "CCSDS Telemetry Secondary Header (subseconds)"
   # GENERIC_CSS_Device_Data_tlm_t
-  APPEND_ITEM    GENERIC_CSS_DATA0    16 UINT         "Raw css[0] (0-65535)"
-  APPEND_ITEM    GENERIC_CSS_DATA1    16 UINT         "Raw css[1] (0-65535)"
-  APPEND_ITEM    GENERIC_CSS_DATA2    16 UINT         "Raw css[2] (0-65535)"
-  APPEND_ITEM    GENERIC_CSS_DATA3    16 UINT         "Raw css[3] (0-65535)"
-  APPEND_ITEM    GENERIC_CSS_DATA4    16 UINT         "Raw css[4] (0-65535)"
-  APPEND_ITEM    GENERIC_CSS_DATA5    16 UINT         "Raw css[5] (0-65535)"
+  APPEND_ITEM    RAW_CSS_0            16 UINT         "Raw css[0] (0-65535)"
+  APPEND_ITEM    RAW_CSS_1            16 UINT         "Raw css[1] (0-65535)"
+  APPEND_ITEM    RAW_CSS_2            16 UINT         "Raw css[2] (0-65535)"
+  APPEND_ITEM    RAW_CSS_3            16 UINT         "Raw css[3] (0-65535)"
+  APPEND_ITEM    RAW_CSS_4            16 UINT         "Raw css[4] (0-65535)"
+  APPEND_ITEM    RAW_CSS_5            16 UINT         "Raw css[5] (0-65535)"
   
