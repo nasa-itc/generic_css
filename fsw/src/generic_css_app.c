@@ -17,32 +17,6 @@
 */
 GENERIC_CSS_AppData_t GENERIC_CSS_AppData;
 
-static CFE_EVS_BinFilter_t  GENERIC_CSS_EventFilters[] =
-{   /* Event ID    mask */
-    {GENERIC_CSS_RESERVED_EID,           0x0000},
-    {GENERIC_CSS_STARTUP_INF_EID,        0x0000},
-    {GENERIC_CSS_LEN_ERR_EID,            0x0000},
-    {GENERIC_CSS_PIPE_ERR_EID,           0x0000},
-    {GENERIC_CSS_SUB_CMD_ERR_EID,        0x0000},
-    {GENERIC_CSS_SUB_REQ_HK_ERR_EID,     0x0000},
-    {GENERIC_CSS_PROCESS_CMD_ERR_EID,    0x0000},
-    {GENERIC_CSS_CMD_ERR_EID,            0x0000},
-    {GENERIC_CSS_CMD_NOOP_INF_EID,       0x0000},
-    {GENERIC_CSS_CMD_RESET_INF_EID,      0x0000},
-    {GENERIC_CSS_CMD_ENABLE_INF_EID,     0x0000},
-    {GENERIC_CSS_ENABLE_INF_EID,         0x0000},
-    {GENERIC_CSS_ENABLE_ERR_EID,         0x0000},
-    {GENERIC_CSS_CMD_DISABLE_INF_EID,    0x0000},
-    {GENERIC_CSS_DISABLE_INF_EID,        0x0000},
-    {GENERIC_CSS_DISABLE_ERR_EID,        0x0000},
-    {GENERIC_CSS_DEVICE_TLM_ERR_EID,     0x0000},
-    {GENERIC_CSS_REQ_HK_ERR_EID,         0x0000},
-    {GENERIC_CSS_REQ_DATA_ERR_EID,       0x0000},
-    {GENERIC_CSS_I2C_INIT_ERR_EID,       0x0000},
-    {GENERIC_CSS_I2C_READ_ERR_EID,       0x0000},
-};
-
-
 /*
 ** Application entry point and main process loop
 */
@@ -136,9 +110,7 @@ int32 GENERIC_CSS_AppInit(void)
     /*
     ** Register the events
     */ 
-    status = CFE_EVS_Register(GENERIC_CSS_EventFilters,
-                              sizeof(GENERIC_CSS_EventFilters)/sizeof(CFE_EVS_BinFilter_t),
-                              CFE_EVS_BINARY_FILTER);    /* as default, no filters are used */
+    status = CFE_EVS_Register(NULL, 0, CFE_EVS_BINARY_FILTER);    /* as default, no filters are used */
     if (status != CFE_SUCCESS)
     {
         CFE_ES_WriteToSysLog("GENERIC_CSS: Error registering for event services: 0x%08X\n", (unsigned int) status);
