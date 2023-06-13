@@ -60,7 +60,7 @@ namespace Nos3
         std::vector<std::string> lines = dp->get_lines();
         try 
         {
-            for (int i = 0; i < lines.size(); i++) 
+            for (unsigned int i = 0; i < lines.size(); i++) 
             {
                 /* Debugging print
                 sim_logger->debug("Line[%d] = %s", i, lines[i].c_str());
@@ -114,8 +114,7 @@ namespace Nos3
         sim_logger->trace("Generic_cssDataPoint::to_string:  Executed");
         std::stringstream output;
         output << "Channel values: ";
-        int i;
-        for (i = 0; i < _generic_css_data.size(); i++) {
+        for (unsigned int i = 0; i < _generic_css_data.size(); i++) {
             output << _generic_css_data[i];
             if (i < _generic_css_data.size() - 1) {
                 output << ", ";

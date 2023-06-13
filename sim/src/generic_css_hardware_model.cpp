@@ -142,7 +142,7 @@ namespace Nos3
     {
         _hardware_model->create_generic_css_data(_i2c_out_data);
         sim_logger->debug("i2c_read: %s", SimIHardwareModel::uint8_vector_to_hex_string(_i2c_out_data).c_str());
-        for (int i = 0; i < rlen; i++) 
+        for (size_t i = 0; i < rlen; i++) 
         {
             if (i < sizeof(_i2c_out_data))
             {

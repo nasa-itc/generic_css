@@ -20,7 +20,7 @@ namespace Nos3
     private:
         /* Disallow these */
         ~Generic_cssDataProvider(void) {};
-        Generic_cssDataProvider& operator=(const Generic_cssDataProvider&) {};
+        Generic_cssDataProvider& operator=(const Generic_cssDataProvider&) {return *this;};
 
         mutable double _request_count;
     };
