@@ -29,8 +29,3 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH}:$ORIGIN/../lib") # Pick up .so i
 add_library(generic_css_sim SHARED ${generic_css_sim_src} ${generic_css_sim_inc})
 target_link_libraries(generic_css_sim ${generic_css_sim_libs})
 install(TARGETS generic_css_sim LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
-
-add_executable(nos3-generic-css-simulator src/generic_css_sim.cpp)
-target_link_libraries(nos3-generic-css-simulator generic_css_sim ${generic_css_sim_libs})
-install(TARGETS nos3-generic-css-simulator RUNTIME DESTINATION bin)
-install(TARGETS generic_css_sim LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
