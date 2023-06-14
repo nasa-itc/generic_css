@@ -411,7 +411,7 @@ void GENERIC_CSS_ReportDeviceTelemetry(void)
     /* Check that device is enabled */
     if (GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled == GENERIC_CSS_DEVICE_ENABLED)
     {
-        status = GENERIC_CSS_RequestData(GENERIC_CSS_AppData.Generic_cssI2c.handle, &GENERIC_CSS_AppData.DevicePkt.Generic_css);
+        status = GENERIC_CSS_RequestData(&GENERIC_CSS_AppData.Generic_cssI2c, &GENERIC_CSS_AppData.DevicePkt.Generic_css);
         if (status == OS_SUCCESS)
         {
             GENERIC_CSS_AppData.HkTelemetryPkt.DeviceCount++;
