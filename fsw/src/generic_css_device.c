@@ -15,12 +15,12 @@
 /*
 ** Request data command
 */
-int32_t GENERIC_CSS_RequestData(int32_t handle, GENERIC_CSS_Device_Data_tlm_t* data)
+int32_t GENERIC_CSS_RequestData(i2c_bus_info_t* device, GENERIC_CSS_Device_Data_tlm_t* data)
 {
     int32_t status = OS_SUCCESS;
     uint8_t read_data[GENERIC_CSS_DEVICE_DATA_LNGTH] = {0};
 
-    status = i2c_master_transaction(handle, GENERIC_CSS_I2C_ADDRESS, NULL, 0, read_data, GENERIC_CSS_DEVICE_DATA_LNGTH, GENERIC_CSS_CFG_MS_TIMEOUT);
+    status = i2c_master_transaction(device, GENERIC_CSS_I2C_ADDRESS, NULL, 0, read_data, GENERIC_CSS_DEVICE_DATA_LNGTH, GENERIC_CSS_CFG_MS_TIMEOUT);
     if (status == OS_SUCCESS)
     {
         #ifdef GENERIC_CSS_CFG_DEBUG

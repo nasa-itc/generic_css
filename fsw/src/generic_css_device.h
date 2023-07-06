@@ -36,6 +36,6 @@ typedef struct
 /*
 ** Prototypes
 */
-int32_t GENERIC_CSS_RequestData(int32_t handle, GENERIC_CSS_Device_Data_tlm_t* data);
+int32_t GENERIC_CSS_RequestData(i2c_bus_info_t* device, GENERIC_CSS_Device_Data_tlm_t* data);
 
 #endif /* _GENERIC_CSS_DEVICE_H_ */
