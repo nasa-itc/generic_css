@@ -29,7 +29,7 @@
 typedef struct
 {
     uint16_t Voltage[GENERIC_CSS_NUM_CHANNELS];
-} OS_PACK GENERIC_CSS_Device_Data_tlm_t;
+} __attribute__((packed)) GENERIC_CSS_Device_Data_tlm_t;
 #define GENERIC_CSS_DEVICE_DATA_LNGTH sizeof ( GENERIC_CSS_Device_Data_tlm_t )
 
 
