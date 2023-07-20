@@ -47,62 +47,46 @@ namespace Nos3
         std::vector<float> illum(6, 0.0);
         _generic_css_data = illum;
 
-        /*
-        ** Declare 42 telemetry string prefix
-        ** 42 variables defined in `42/Include/42types.h`
-        ** 42 data stream defined in `42/Source/IPC/SimWriteToSocket.c`
-        */
-        std::ostringstream MatchString;
-        MatchString << "SC[" << spacecraft << "].AC.CSS";
-        size_t MSsize = MatchString.str().size();
+        try{
+            /*
+            ** Declare 42 telemetry string prefix
+            ** 42 variables defined in `42/Include/42types.h`
+            ** 42 data stream defined in `42/Source/IPC/SimWriteToSocket.c`
+            */
+            std::string key0v;
+            key0v.append("SC[").append(std::to_string(spacecraft)).append("].AC.CSS"); // SC[N].AC.CSS
+            std::string key0i(key0v), key1v(key0v), key1i(key0v), key2v(key0v), key2i(key0v), key3v(key0v), key3i(key0v), key4v(key0v), key4i(key0v), key5v(key0v), key5i(key0v);
+            key0v.append("[0].Valid");
+            key0i.append("[0].Illum");
+            key1v.append("[1].Valid");
+            key1i.append("[1].Illum");
+            key2v.append("[2].Valid");
+            key2i.append("[2].Illum");
+            key3v.append("[3].Valid");
+            key3i.append("[3].Illum");
+            key4v.append("[4].Valid");
+            key4i.append("[4].Illum");
+            key5v.append("[5].Valid");
+            key5i.append("[5].Illum");
 
-        /* Parse 42 telemetry */
-        std::vector<std::string> lines = dp->get_lines();
-        try 
-        {
-            for (unsigned int i = 0; i < lines.size(); i++) 
-            {
-                /* Debugging print
-                sim_logger->debug("Line[%d] = %s", i, lines[i].c_str());
-                */ 
-
-                // Compare prefix
-                if (lines[i].compare(0, MSsize, MatchString.str()) == 0) 
-                {
-                    size_t lb = lines[i].find_first_of("[", MSsize);
-                    size_t rb = lines[i].find_first_of("]", MSsize);
-                    int index = std::stoi(lines[i].substr(lb+1, rb-lb-1));
-                    if ((index >= 0) && (index < numChannels)) {
-                        std::string param(lines[i].substr(rb+2, 5));
-                        size_t equal = lines[i].find_first_of("=");
-                        std::string value(lines[i].substr(equal+1, lines[i].size()-equal-1));
-                        if (param.compare("Valid") == 0) 
-                        {
-                            int flag = std::stoi(value);
-                            if (flag != 0) 
-                            {
-                                valid[index] = true;
-                            } else 
-                            {
-                                valid[index] = false;
-                                _generic_css_data[index] = 0.0;
-                            }
-                        } else if (param.compare("Illum") == 0) 
-                        {
-                            _generic_css_data[index] = std::stof(value) / scaleFactor;
-                            /* Debugging print
-                            sim_logger->debug("  css[%d] stof(value) = %f ", index, std::stof(value));
-                            sim_logger->debug("  css[%d] stof(value) / scaleFactor = %f ", index, std::stof(value) / scaleFactor);
-                            */
-                        }
-                    }
-                }
-            }
+            /* Parse 42 telemetry */
+            _generic_css_data[0] = std::stof(dp->get_value_for_key(key0i)) / scaleFactor;
+            if (dp->get_value_for_key(key0v) == "0") _generic_css_data[0] = 0.0;
+            _generic_css_data[1] = std::stof(dp->get_value_for_key(key1i)) / scaleFactor;
+            if (dp->get_value_for_key(key1v) == "0") _generic_css_data[1] = 0.0;
+            _generic_css_data[2] = std::stof(dp->get_value_for_key(key2i)) / scaleFactor;
+            if (dp->get_value_for_key(key2v) == "0") _generic_css_data[2] = 0.0;
+            _generic_css_data[3] = std::stof(dp->get_value_for_key(key3i)) / scaleFactor;
+            if (dp->get_value_for_key(key3v) == "0") _generic_css_data[3] = 0.0;
+            _generic_css_data[4] = std::stof(dp->get_value_for_key(key4i)) / scaleFactor;
+            if (dp->get_value_for_key(key4v) == "0") _generic_css_data[4] = 0.0;
+            _generic_css_data[5] = std::stof(dp->get_value_for_key(key5i)) / scaleFactor;
+            if (dp->get_value_for_key(key5v) == "0") _generic_css_data[5] = 0.0;
         } 
         catch(const std::exception& e) 
         {
             /* Force data to be set to known values */
-            std::vector<float> illum(6, 8.0);
+            std::vector<float> illum(6, 0.0);
             _generic_css_data = illum; 
             sim_logger->error("Generic_cssDataPoint::Generic_cssDataPoint:  Parsing exception %s", e.what());
         }
