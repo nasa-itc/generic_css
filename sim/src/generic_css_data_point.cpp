@@ -22,7 +22,7 @@ namespace Nos3
 {
     extern ItcLogger::Logger *sim_logger;
 
-    Generic_cssDataPoint::Generic_cssDataPoint(double count)
+    Generic_cssDataPoint::Generic_cssDataPoint(double count) : _not_parsed(false)
     {
         sim_logger->trace("Generic_cssDataPoint::Generic_cssDataPoint:  Defined Constructor executed");
 
@@ -38,10 +38,13 @@ namespace Nos3
         _generic_css_data[5] = count * 0.001;
     }
 
-    Generic_cssDataPoint::Generic_cssDataPoint(double scaleFactor, int16_t spacecraft, const boost::shared_ptr<Sim42DataPoint> dp)
+    Generic_cssDataPoint::Generic_cssDataPoint(double scale_factor, int16_t spacecraft, const boost::shared_ptr<Sim42DataPoint> dp) : _dp(*dp), _sc(spacecraft), _scale_factor(scale_factor), _not_parsed(true)
     {
         sim_logger->trace("Generic_cssDataPoint::Generic_cssDataPoint:  42 Constructor executed");
+    }
 
+    void Generic_cssDataPoint::do_parsing(void) const
+    {
         /* Initialize data */
         std::vector<bool>   valid(6, false);
         std::vector<float> illum(6, 0.0);
@@ -54,7 +57,7 @@ namespace Nos3
             ** 42 data stream defined in `42/Source/IPC/SimWriteToSocket.c`
             */
             std::string key0v;
-            key0v.append("SC[").append(std::to_string(spacecraft)).append("].AC.CSS"); // SC[N].AC.CSS
+            key0v.append("SC[").append(std::to_string(_sc)).append("].AC.CSS"); // SC[N].AC.CSS
             std::string key0i(key0v), key1v(key0v), key1i(key0v), key2v(key0v), key2i(key0v), key3v(key0v), key3i(key0v), key4v(key0v), key4i(key0v), key5v(key0v), key5i(key0v);
             key0v.append("[0].Valid");
             key0i.append("[0].Illum");
@@ -70,18 +73,20 @@ namespace Nos3
             key5i.append("[5].Illum");
 
             /* Parse 42 telemetry */
-            _generic_css_data[0] = std::stof(dp->get_value_for_key(key0i)) / scaleFactor;
-            if (dp->get_value_for_key(key0v) == "0") _generic_css_data[0] = 0.0;
-            _generic_css_data[1] = std::stof(dp->get_value_for_key(key1i)) / scaleFactor;
-            if (dp->get_value_for_key(key1v) == "0") _generic_css_data[1] = 0.0;
-            _generic_css_data[2] = std::stof(dp->get_value_for_key(key2i)) / scaleFactor;
-            if (dp->get_value_for_key(key2v) == "0") _generic_css_data[2] = 0.0;
-            _generic_css_data[3] = std::stof(dp->get_value_for_key(key3i)) / scaleFactor;
-            if (dp->get_value_for_key(key3v) == "0") _generic_css_data[3] = 0.0;
-            _generic_css_data[4] = std::stof(dp->get_value_for_key(key4i)) / scaleFactor;
-            if (dp->get_value_for_key(key4v) == "0") _generic_css_data[4] = 0.0;
-            _generic_css_data[5] = std::stof(dp->get_value_for_key(key5i)) / scaleFactor;
-            if (dp->get_value_for_key(key5v) == "0") _generic_css_data[5] = 0.0;
+            _generic_css_data[0] = std::stof(_dp.get_value_for_key(key0i)) / _scale_factor;
+            if (_dp.get_value_for_key(key0v) == "0") _generic_css_data[0] = 0.0;
+            _generic_css_data[1] = std::stof(_dp.get_value_for_key(key1i)) / _scale_factor;
+            if (_dp.get_value_for_key(key1v) == "0") _generic_css_data[1] = 0.0;
+            _generic_css_data[2] = std::stof(_dp.get_value_for_key(key2i)) / _scale_factor;
+            if (_dp.get_value_for_key(key2v) == "0") _generic_css_data[2] = 0.0;
+            _generic_css_data[3] = std::stof(_dp.get_value_for_key(key3i)) / _scale_factor;
+            if (_dp.get_value_for_key(key3v) == "0") _generic_css_data[3] = 0.0;
+            _generic_css_data[4] = std::stof(_dp.get_value_for_key(key4i)) / _scale_factor;
+            if (_dp.get_value_for_key(key4v) == "0") _generic_css_data[4] = 0.0;
+            _generic_css_data[5] = std::stof(_dp.get_value_for_key(key5i)) / _scale_factor;
+            if (_dp.get_value_for_key(key5v) == "0") _generic_css_data[5] = 0.0;
+
+            _not_parsed = false;
         } 
         catch(const std::exception& e) 
         {
