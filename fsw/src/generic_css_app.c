@@ -20,14 +20,9 @@ GENERIC_CSS_AppData_t GENERIC_CSS_AppData;
 /*
 ** Application entry point and main process loop
 */
-void GENERIC_CSS_AppMain(void)
+void CSS_AppMain(void)
 {
     int32 status = OS_SUCCESS;
-
-    /*
-    ** Register the application with executive services
-    */
-    CFE_ES_RegisterApp();
 
     /*
     ** Create the first Performance Log entry
@@ -40,13 +35,13 @@ void GENERIC_CSS_AppMain(void)
     status = GENERIC_CSS_AppInit();
     if (status != CFE_SUCCESS)
     {
-        GENERIC_CSS_AppData.RunStatus = CFE_ES_APP_ERROR;
+        GENERIC_CSS_AppData.RunStatus = CFE_ES_RunStatus_APP_ERROR;
     }
 
     /*
     ** Main loop
     */
-    while (CFE_ES_RunLoop(&GENERIC_CSS_AppData.RunStatus) == TRUE)
+    while (CFE_ES_RunLoop(&GENERIC_CSS_AppData.RunStatus) == true)
     {
         /*
         ** Performance log exit stamp
@@ -57,7 +52,7 @@ void GENERIC_CSS_AppMain(void)
         ** Pend on the arrival of the next Software Bus message
         ** Note that this is the standard, but timeouts are available
         */
-        status = CFE_SB_RcvMsg(&GENERIC_CSS_AppData.MsgPtr, GENERIC_CSS_AppData.CmdPipe, CFE_SB_PEND_FOREVER);
+        status = CFE_SB_ReceiveBuffer((CFE_SB_Buffer_t **)&GENERIC_CSS_AppData.MsgPtr,  GENERIC_CSS_AppData.CmdPipe,  CFE_SB_PEND_FOREVER);
         
         /* 
         ** Begin performance metrics on anything after this line. This will help to determine
@@ -66,7 +61,7 @@ void GENERIC_CSS_AppMain(void)
         CFE_ES_PerfLogEntry(GENERIC_CSS_PERF_ID);
 
         /*
-        ** If the CFE_SB_RcvMsg was successful, then continue to process the command packet
+        ** If the CFE_SB_ReceiveBuffer was successful, then continue to process the command packet
         ** If not, then exit the application in error.
         ** Note that a SB read error should not always result in an app quitting.
         */
@@ -76,8 +71,8 @@ void GENERIC_CSS_AppMain(void)
         }
         else
         {
-            CFE_EVS_SendEvent(GENERIC_CSS_PIPE_ERR_EID, CFE_EVS_ERROR, "GENERIC_CSS: SB Pipe Read Error = %d", (int) status);
-            GENERIC_CSS_AppData.RunStatus = CFE_ES_APP_ERROR;
+            CFE_EVS_SendEvent(GENERIC_CSS_PIPE_ERR_EID, CFE_EVS_EventType_ERROR, "GENERIC_CSS: SB Pipe Read Error = %d", (int) status);
+            GENERIC_CSS_AppData.RunStatus = CFE_ES_RunStatus_APP_ERROR;
         }
     }
 
@@ -105,12 +100,12 @@ int32 GENERIC_CSS_AppInit(void)
 {
     int32 status = OS_SUCCESS;
     
-    GENERIC_CSS_AppData.RunStatus = CFE_ES_APP_RUN;
+    GENERIC_CSS_AppData.RunStatus = CFE_ES_RunStatus_APP_RUN;
 
     /*
     ** Register the events
     */ 
-    status = CFE_EVS_Register(NULL, 0, CFE_EVS_BINARY_FILTER);    /* as default, no filters are used */
+    status = CFE_EVS_Register(NULL, 0, CFE_EVS_EventFilter_BINARY);    /* as default, no filters are used */
     if (status != CFE_SUCCESS)
     {
         CFE_ES_WriteToSysLog("GENERIC_CSS: Error registering for event services: 0x%08X\n", (unsigned int) status);
@@ -123,7 +118,7 @@ int32 GENERIC_CSS_AppInit(void)
     status = CFE_SB_CreatePipe(&GENERIC_CSS_AppData.CmdPipe, GENERIC_CSS_PIPE_DEPTH, "CSS_CMD_PIPE");
     if (status != CFE_SUCCESS)
     {
-        CFE_EVS_SendEvent(GENERIC_CSS_PIPE_ERR_EID, CFE_EVS_ERROR,
+        CFE_EVS_SendEvent(GENERIC_CSS_PIPE_ERR_EID, CFE_EVS_EventType_ERROR,
             "Error Creating SB Pipe,RC=0x%08X",(unsigned int) status);
        return status;
     }
@@ -131,10 +126,10 @@ int32 GENERIC_CSS_AppInit(void)
     /*
     ** Subscribe to ground commands
     */
-    status = CFE_SB_Subscribe(GENERIC_CSS_CMD_MID, GENERIC_CSS_AppData.CmdPipe);
+    status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(GENERIC_CSS_CMD_MID), GENERIC_CSS_AppData.CmdPipe);
     if (status != CFE_SUCCESS)
     {
-        CFE_EVS_SendEvent(GENERIC_CSS_SUB_CMD_ERR_EID, CFE_EVS_ERROR,
+        CFE_EVS_SendEvent(GENERIC_CSS_SUB_CMD_ERR_EID, CFE_EVS_EventType_ERROR,
             "Error Subscribing to HK Gnd Cmds, MID=0x%04X, RC=0x%08X",
             GENERIC_CSS_CMD_MID, (unsigned int) status);
         return status;
@@ -143,10 +138,10 @@ int32 GENERIC_CSS_AppInit(void)
     /*
     ** Subscribe to housekeeping (hk) message requests
     */
-    status = CFE_SB_Subscribe(GENERIC_CSS_REQ_HK_MID, GENERIC_CSS_AppData.CmdPipe);
+    status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(GENERIC_CSS_REQ_HK_MID), GENERIC_CSS_AppData.CmdPipe);
     if (status != CFE_SUCCESS)
     {
-        CFE_EVS_SendEvent(GENERIC_CSS_SUB_REQ_HK_ERR_EID, CFE_EVS_ERROR,
+        CFE_EVS_SendEvent(GENERIC_CSS_SUB_REQ_HK_ERR_EID, CFE_EVS_EventType_ERROR,
             "Error Subscribing to HK Request, MID=0x%04X, RC=0x%08X",
             GENERIC_CSS_REQ_HK_MID, (unsigned int) status);
         return status;
@@ -156,18 +151,17 @@ int32 GENERIC_CSS_AppInit(void)
     ** Initialize the published HK message - this HK message will contain the 
     ** telemetry that has been defined in the GENERIC_CSS_HkTelemetryPkt for this app.
     */
-    CFE_SB_InitMsg(&GENERIC_CSS_AppData.HkTelemetryPkt,
-                   GENERIC_CSS_HK_TLM_MID,
-                   GENERIC_CSS_HK_TLM_LNGTH, TRUE);
+    CFE_MSG_Init(CFE_MSG_PTR(GENERIC_CSS_AppData.HkTelemetryPkt.TlmHeader),
+                   CFE_SB_ValueToMsgId(GENERIC_CSS_HK_TLM_MID),
+                   GENERIC_CSS_HK_TLM_LNGTH);
 
     /*
     ** Initialize the device packet message
     ** This packet is specific to your application
     */
-    CFE_SB_InitMsg(&GENERIC_CSS_AppData.DevicePkt,
-                   GENERIC_CSS_DEVICE_TLM_MID,
-                   GENERIC_CSS_DEVICE_TLM_LNGTH, TRUE);
-
+    CFE_MSG_Init(CFE_MSG_PTR(GENERIC_CSS_AppData.DevicePkt.TlmHeader),
+                   CFE_SB_ValueToMsgId(GENERIC_CSS_DEVICE_TLM_MID),
+                   GENERIC_CSS_DEVICE_TLM_LNGTH);
 
     /* 
     ** Always reset all counters during application initialization 
@@ -188,7 +182,7 @@ int32 GENERIC_CSS_AppInit(void)
      ** Send an information event that the app has initialized. 
      ** This is useful for debugging the loading of individual applications.
      */
-    status = CFE_EVS_SendEvent(GENERIC_CSS_STARTUP_INF_EID, CFE_EVS_INFORMATION,
+    status = CFE_EVS_SendEvent(GENERIC_CSS_STARTUP_INF_EID, CFE_EVS_EventType_INFORMATION,
                "GENERIC_CSS App Initialized. Version %d.%d.%d.%d",
                 GENERIC_CSS_MAJOR_VERSION,
                 GENERIC_CSS_MINOR_VERSION, 
@@ -207,8 +201,9 @@ int32 GENERIC_CSS_AppInit(void)
 */
 void GENERIC_CSS_ProcessCommandPacket(void)
 {
-    CFE_SB_MsgId_t MsgId = CFE_SB_GetMsgId(GENERIC_CSS_AppData.MsgPtr);
-    switch (MsgId)
+    CFE_SB_MsgId_t MsgId = CFE_SB_INVALID_MSG_ID;
+    CFE_MSG_GetMsgId(GENERIC_CSS_AppData.MsgPtr, &MsgId);
+    switch (CFE_SB_MsgIdToValue(MsgId))
     {
         /*
         ** Ground Commands with command codes fall under the GENERIC_CSS_CMD_MID (Message ID)
@@ -230,7 +225,7 @@ void GENERIC_CSS_ProcessCommandPacket(void)
         */
         default:
             GENERIC_CSS_AppData.HkTelemetryPkt.CommandErrorCount++;
-            CFE_EVS_SendEvent(GENERIC_CSS_PROCESS_CMD_ERR_EID,CFE_EVS_ERROR, "GENERIC_CSS: Invalid command packet, MID = 0x%x", MsgId);
+            CFE_EVS_SendEvent(GENERIC_CSS_PROCESS_CMD_ERR_EID,CFE_EVS_EventType_ERROR, "GENERIC_CSS: Invalid command packet, MID = 0x%x", CFE_SB_MsgIdToValue(MsgId));
             break;
     }
     return;
@@ -239,22 +234,23 @@ void GENERIC_CSS_ProcessCommandPacket(void)
 
 /*
 ** Process ground commands
-** TODO: Add additional commands required by the specific component
 */
 void GENERIC_CSS_ProcessGroundCommand(void)
 {
     int32 status = OS_SUCCESS;
+    CFE_SB_MsgId_t MsgId = CFE_SB_INVALID_MSG_ID;
+    CFE_MSG_FcnCode_t CommandCode = 0;
 
     /*
     ** MsgId is only needed if the command code is not recognized. See default case
     */
-    CFE_SB_MsgId_t MsgId = CFE_SB_GetMsgId(GENERIC_CSS_AppData.MsgPtr);   
+    CFE_MSG_GetMsgId(GENERIC_CSS_AppData.MsgPtr, &MsgId);   
 
     /*
     ** Ground Commands, by definition, have a command code (_CC) associated with them
     ** Pull this command code from the message and then process
     */
-    uint16 CommandCode = CFE_SB_GetCmdCode(GENERIC_CSS_AppData.MsgPtr);
+    CFE_MSG_GetFcnCode(GENERIC_CSS_AppData.MsgPtr, &CommandCode);
     switch (CommandCode)
     {
         /*
@@ -268,7 +264,7 @@ void GENERIC_CSS_ProcessGroundCommand(void)
             if (GENERIC_CSS_VerifyCmdLength(GENERIC_CSS_AppData.MsgPtr, sizeof(GENERIC_CSS_NoArgs_cmd_t)) == OS_SUCCESS)
             {
                 /* Second, send EVS event on successful receipt ground commands*/
-                CFE_EVS_SendEvent(GENERIC_CSS_CMD_NOOP_INF_EID, CFE_EVS_INFORMATION, "GENERIC_CSS: NOOP command received");
+                CFE_EVS_SendEvent(GENERIC_CSS_CMD_NOOP_INF_EID, CFE_EVS_EventType_INFORMATION, "GENERIC_CSS: NOOP command received");
                 /* Third, do the desired command action if applicable, in the case of NOOP it is no operation */
             }
             break;
@@ -279,7 +275,7 @@ void GENERIC_CSS_ProcessGroundCommand(void)
         case GENERIC_CSS_RESET_COUNTERS_CC:
             if (GENERIC_CSS_VerifyCmdLength(GENERIC_CSS_AppData.MsgPtr, sizeof(GENERIC_CSS_NoArgs_cmd_t)) == OS_SUCCESS)
             {
-                CFE_EVS_SendEvent(GENERIC_CSS_CMD_RESET_INF_EID, CFE_EVS_INFORMATION, "GENERIC_CSS: RESET counters command received");
+                CFE_EVS_SendEvent(GENERIC_CSS_CMD_RESET_INF_EID, CFE_EVS_EventType_INFORMATION, "GENERIC_CSS: RESET counters command received");
                 GENERIC_CSS_ResetCounters();
             }
             break;
@@ -290,7 +286,7 @@ void GENERIC_CSS_ProcessGroundCommand(void)
         case GENERIC_CSS_ENABLE_CC:
             if (GENERIC_CSS_VerifyCmdLength(GENERIC_CSS_AppData.MsgPtr, sizeof(GENERIC_CSS_NoArgs_cmd_t)) == OS_SUCCESS)
             {
-                CFE_EVS_SendEvent(GENERIC_CSS_CMD_ENABLE_INF_EID, CFE_EVS_INFORMATION, "GENERIC_CSS: Enable command received");
+                CFE_EVS_SendEvent(GENERIC_CSS_CMD_ENABLE_INF_EID, CFE_EVS_EventType_INFORMATION, "GENERIC_CSS: Enable command received");
                 GENERIC_CSS_Enable();
             }
             break;
@@ -301,7 +297,7 @@ void GENERIC_CSS_ProcessGroundCommand(void)
         case GENERIC_CSS_DISABLE_CC:
             if (GENERIC_CSS_VerifyCmdLength(GENERIC_CSS_AppData.MsgPtr, sizeof(GENERIC_CSS_NoArgs_cmd_t)) == OS_SUCCESS)
             {
-                CFE_EVS_SendEvent(GENERIC_CSS_CMD_DISABLE_INF_EID, CFE_EVS_INFORMATION, "GENERIC_CSS: Disable command received");
+                CFE_EVS_SendEvent(GENERIC_CSS_CMD_DISABLE_INF_EID, CFE_EVS_EventType_INFORMATION, "GENERIC_CSS: Disable command received");
                 GENERIC_CSS_Disable();
             }
             break;
@@ -312,8 +308,8 @@ void GENERIC_CSS_ProcessGroundCommand(void)
         default:
             /* Increment the error counter upon receipt of an invalid command */
             GENERIC_CSS_AppData.HkTelemetryPkt.CommandErrorCount++;
-            CFE_EVS_SendEvent(GENERIC_CSS_CMD_ERR_EID, CFE_EVS_ERROR, 
-                "GENERIC_CSS: Invalid command code for packet, MID = 0x%x, cmdCode = 0x%x", MsgId, CommandCode);
+            CFE_EVS_SendEvent(GENERIC_CSS_CMD_ERR_EID, CFE_EVS_EventType_ERROR, 
+                "GENERIC_CSS: Invalid command code for packet, MID = 0x%x, cmdCode = 0x%x", CFE_SB_MsgIdToValue(MsgId), CommandCode);
             break;
     }
     return;
@@ -322,17 +318,18 @@ void GENERIC_CSS_ProcessGroundCommand(void)
 
 /*
 ** Process Telemetry Request - Triggered in response to a telemetery request
-** TODO: Add additional telemetry required by the specific component
 */
 void GENERIC_CSS_ProcessTelemetryRequest(void)
 {
     int32 status = OS_SUCCESS;
+    CFE_SB_MsgId_t MsgId = CFE_SB_INVALID_MSG_ID;
+    CFE_MSG_FcnCode_t CommandCode = 0;
 
     /* MsgId is only needed if the command code is not recognized. See default case */
-    CFE_SB_MsgId_t MsgId = CFE_SB_GetMsgId(GENERIC_CSS_AppData.MsgPtr);   
+    CFE_MSG_GetMsgId(GENERIC_CSS_AppData.MsgPtr, &MsgId);
 
     /* Pull this command code from the message and then process */
-    uint16 CommandCode = CFE_SB_GetCmdCode(GENERIC_CSS_AppData.MsgPtr);
+    CFE_MSG_GetFcnCode(GENERIC_CSS_AppData.MsgPtr, &CommandCode);
     switch (CommandCode)
     {
         case GENERIC_CSS_REQ_HK_TLM:
@@ -349,8 +346,8 @@ void GENERIC_CSS_ProcessTelemetryRequest(void)
         default:
             /* Increment the error counter upon receipt of an invalid command */
             GENERIC_CSS_AppData.HkTelemetryPkt.CommandErrorCount++;
-            CFE_EVS_SendEvent(GENERIC_CSS_DEVICE_TLM_ERR_EID, CFE_EVS_ERROR, 
-                "GENERIC_CSS: Invalid command code for packet, MID = 0x%x, cmdCode = 0x%x", MsgId, CommandCode);
+            CFE_EVS_SendEvent(GENERIC_CSS_DEVICE_TLM_ERR_EID, CFE_EVS_EventType_ERROR, 
+                "GENERIC_CSS: Invalid command code for packet, MID = 0x%x, cmdCode = 0x%x", CFE_SB_MsgIdToValue(MsgId), CommandCode);
             break;
     }
     return;
@@ -367,8 +364,8 @@ void GENERIC_CSS_ReportHousekeeping(void)
     /* No HK data to request from device */
 
     /* Time stamp and publish housekeeping telemetry */
-    CFE_SB_TimeStampMsg((CFE_SB_Msg_t *) &GENERIC_CSS_AppData.HkTelemetryPkt);
-    CFE_SB_SendMsg((CFE_SB_Msg_t *) &GENERIC_CSS_AppData.HkTelemetryPkt);
+    CFE_SB_TimeStampMsg((CFE_MSG_Message_t *) &GENERIC_CSS_AppData.HkTelemetryPkt);
+    CFE_SB_TransmitMsg((CFE_MSG_Message_t *) &GENERIC_CSS_AppData.HkTelemetryPkt, true);
     return;
 }
 
@@ -388,13 +385,13 @@ void GENERIC_CSS_ReportDeviceTelemetry(void)
         {
             GENERIC_CSS_AppData.HkTelemetryPkt.DeviceCount++;
             /* Time stamp and publish data telemetry */
-            CFE_SB_TimeStampMsg((CFE_SB_Msg_t *) &GENERIC_CSS_AppData.DevicePkt);
-            CFE_SB_SendMsg((CFE_SB_Msg_t *) &GENERIC_CSS_AppData.DevicePkt);
+            CFE_SB_TimeStampMsg((CFE_MSG_Message_t *) &GENERIC_CSS_AppData.DevicePkt);
+            CFE_SB_TransmitMsg((CFE_MSG_Message_t *) &GENERIC_CSS_AppData.DevicePkt, true);
         }
         else
         {
             GENERIC_CSS_AppData.HkTelemetryPkt.DeviceErrorCount++;
-            CFE_EVS_SendEvent(GENERIC_CSS_REQ_DATA_ERR_EID, CFE_EVS_ERROR, 
+            CFE_EVS_SendEvent(GENERIC_CSS_REQ_DATA_ERR_EID, CFE_EVS_EventType_ERROR, 
                     "GENERIC_CSS: Request device data reported error %d", status);
         }
     }
@@ -432,18 +429,18 @@ void GENERIC_CSS_Enable(void)
         {
             GENERIC_CSS_AppData.HkTelemetryPkt.DeviceCount++;
             GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_ENABLED;
-            CFE_EVS_SendEvent(GENERIC_CSS_ENABLE_INF_EID, CFE_EVS_INFORMATION, "GENERIC_CSS: Device enabled");
+            CFE_EVS_SendEvent(GENERIC_CSS_ENABLE_INF_EID, CFE_EVS_EventType_INFORMATION, "GENERIC_CSS: Device enabled");
         }
         else
         {
             GENERIC_CSS_AppData.HkTelemetryPkt.DeviceErrorCount++;
-            CFE_EVS_SendEvent(GENERIC_CSS_I2C_INIT_ERR_EID, CFE_EVS_ERROR, "GENERIC_CSS: I2C port initialization error %d", status);
+            CFE_EVS_SendEvent(GENERIC_CSS_I2C_INIT_ERR_EID, CFE_EVS_EventType_ERROR, "GENERIC_CSS: I2C port initialization error %d", status);
         }
     }
     else
     {
         GENERIC_CSS_AppData.HkTelemetryPkt.DeviceErrorCount++;
-        CFE_EVS_SendEvent(GENERIC_CSS_ENABLE_ERR_EID, CFE_EVS_ERROR, "GENERIC_CSS: Device enable failed, already enabled");
+        CFE_EVS_SendEvent(GENERIC_CSS_ENABLE_ERR_EID, CFE_EVS_EventType_ERROR, "GENERIC_CSS: Device enable failed, already enabled");
     }
     return;
 }
@@ -461,12 +458,12 @@ void GENERIC_CSS_Disable(void)
     {
         GENERIC_CSS_AppData.HkTelemetryPkt.DeviceCount++;
         GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_DISABLED;
-        CFE_EVS_SendEvent(GENERIC_CSS_DISABLE_INF_EID, CFE_EVS_INFORMATION, "GENERIC_CSS: Device disabled");
+        CFE_EVS_SendEvent(GENERIC_CSS_DISABLE_INF_EID, CFE_EVS_EventType_INFORMATION, "GENERIC_CSS: Device disabled");
     }
     else
     {
         GENERIC_CSS_AppData.HkTelemetryPkt.DeviceErrorCount++;
-        CFE_EVS_SendEvent(GENERIC_CSS_DISABLE_ERR_EID, CFE_EVS_ERROR, "GENERIC_CSS: Device disable failed, already disabled");
+        CFE_EVS_SendEvent(GENERIC_CSS_DISABLE_ERR_EID, CFE_EVS_EventType_ERROR, "GENERIC_CSS: Device disable failed, already disabled");
     }
     return;
 }
@@ -475,13 +472,14 @@ void GENERIC_CSS_Disable(void)
 /*
 ** Verify command packet length matches expected
 */
-int32 GENERIC_CSS_VerifyCmdLength(CFE_SB_MsgPtr_t msg, uint16 expected_length)
+int32 GENERIC_CSS_VerifyCmdLength(CFE_MSG_Message_t * msg, uint16 expected_length)
 {     
     int32 status = OS_SUCCESS;
-    CFE_SB_MsgId_t msg_id = 0xFFFF;
-    uint16 cmd_code = 0xFFFF;
-    uint16 actual_length = CFE_SB_GetTotalMsgLength(msg);
-
+    CFE_SB_MsgId_t msg_id = CFE_SB_INVALID_MSG_ID;
+    CFE_MSG_FcnCode_t cmd_code = 0;
+    size_t actual_length = 0;
+    
+    CFE_MSG_GetSize(msg, &actual_length);
     if (expected_length == actual_length)
     {
         /* Increment the command counter upon receipt of an invalid command */
@@ -489,12 +487,12 @@ int32 GENERIC_CSS_VerifyCmdLength(CFE_SB_MsgPtr_t msg, uint16 expected_length)
     }
     else
     {
-        msg_id = CFE_SB_GetMsgId(msg);
-        cmd_code = CFE_SB_GetCmdCode(msg);
+        CFE_MSG_GetMsgId(msg, &msg_id);
+        CFE_MSG_GetFcnCode(msg, &cmd_code);
 
-        CFE_EVS_SendEvent(GENERIC_CSS_LEN_ERR_EID, CFE_EVS_ERROR,
+        CFE_EVS_SendEvent(GENERIC_CSS_LEN_ERR_EID, CFE_EVS_EventType_ERROR,
            "Invalid msg length: ID = 0x%X,  CC = %d, Len = %d, Expected = %d",
-              msg_id, cmd_code, actual_length, expected_length);
+              CFE_SB_MsgIdToValue(msg_id), cmd_code, actual_length, expected_length);
 
         status = OS_ERROR;
 
