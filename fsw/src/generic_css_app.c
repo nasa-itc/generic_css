@@ -237,7 +237,6 @@ void GENERIC_CSS_ProcessCommandPacket(void)
 */
 void GENERIC_CSS_ProcessGroundCommand(void)
 {
-    int32 status = OS_SUCCESS;
     CFE_SB_MsgId_t MsgId = CFE_SB_INVALID_MSG_ID;
     CFE_MSG_FcnCode_t CommandCode = 0;
 
@@ -321,7 +320,6 @@ void GENERIC_CSS_ProcessGroundCommand(void)
 */
 void GENERIC_CSS_ProcessTelemetryRequest(void)
 {
-    int32 status = OS_SUCCESS;
     CFE_SB_MsgId_t MsgId = CFE_SB_INVALID_MSG_ID;
     CFE_MSG_FcnCode_t CommandCode = 0;
 
@@ -359,8 +357,6 @@ void GENERIC_CSS_ProcessTelemetryRequest(void)
 */
 void GENERIC_CSS_ReportHousekeeping(void)
 {
-    int32 status = OS_SUCCESS;
-
     /* No HK data to request from device */
 
     /* Time stamp and publish housekeeping telemetry */
@@ -451,8 +447,6 @@ void GENERIC_CSS_Enable(void)
 */
 void GENERIC_CSS_Disable(void)
 {
-    int32 status = OS_SUCCESS;
-
     /* Check that device is enabled */
     if (GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled == GENERIC_CSS_DEVICE_ENABLED)
     {
