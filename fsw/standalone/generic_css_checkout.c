@@ -12,13 +12,11 @@
 */
 #include "generic_css_checkout.h"
 
-
 /*
 ** Global Variables
 */
-uart_info_t Generic_cssUart;
-GENERIC_CSS_Device_HK_tlm_t Generic_cssHK;
-GENERIC_CSS_Device_Data_tlm_t Generic_cssData;
+i2c_bus_info_t Generic_CSSI2c;
+GENERIC_CSS_Device_Data_tlm_t Generic_CSSData;
 
 /*
 ** Component Functions
@@ -29,14 +27,8 @@ void print_help(void)
         "---------------------------------------------------------------------\n"
         "help                               - Display help                    \n"
         "exit                               - Exit app                        \n"
-        "noop                               - No operation command to device  \n"
-        "  n                                - ^                               \n"
-        "hk                                 - Request device housekeeping     \n"
-        "  h                                - ^                               \n"
-        "generic_css                             - Request generic_css data             \n"
-        "  s                                - ^                               \n"
-        "cfg #                              - Send configuration #            \n"
-        "  c #                              - ^                               \n"
+        "css                                - Request generic_css data        \n"
+        "  c                                - ^                               \n"
         "\n"
     );
 }
@@ -59,48 +51,22 @@ int get_command(const char* str)
     {
         status = CMD_EXIT;
     }
-    else if(strcmp(lcmd, "noop") == 0) 
-    {
-        status = CMD_NOOP;
-    }
-    else if(strcmp(lcmd, "n") == 0) 
-    {
-        status = CMD_NOOP;
-    }
-    else if(strcmp(lcmd, "hk") == 0) 
-    {
-        status = CMD_HK;
-    }
-    else if(strcmp(lcmd, "h") == 0) 
-    {
-        status = CMD_HK;
-    }
-    else if(strcmp(lcmd, "generic_css") == 0) 
+    else if(strcmp(lcmd, "css") == 0) 
     {
         status = CMD_GENERIC_CSS;
-    }
-    else if(strcmp(lcmd, "s") == 0) 
-    {
-        status = CMD_GENERIC_CSS;
-    }
-    else if(strcmp(lcmd, "cfg") == 0) 
-    {
-        status = CMD_CFG;
     }
     else if(strcmp(lcmd, "c") == 0) 
     {
-        status = CMD_CFG;
+        status = CMD_GENERIC_CSS;
     }
     return status;
 }
 
 
-int process_command(int cc, int num_tokens, char* tokens)
+int process_command(int cc, int num_tokens, char tokens[MAX_INPUT_TOKENS][MAX_INPUT_TOKEN_SIZE])
 {
     int32_t status = OS_SUCCESS;
     int32_t exit_status = OS_SUCCESS;
-    int config;
-
     /* Process command */
     switch(cc) 
     {	
@@ -112,63 +78,17 @@ int process_command(int cc, int num_tokens, char* tokens)
             exit_status = OS_ERROR;
             break;
 
-        case CMD_NOOP:
-            if (check_number_arguments(num_tokens, 1) == OS_SUCCESS)
-            {
-                status = GENERIC_CSS_CommandDevice(Generic_cssUart.handle, GENERIC_CSS_DEVICE_NOOP_CMD, 0);
-                if (status == OS_SUCCESS)
-                {
-                    OS_printf("NOOP command success\n");
-                }
-                else
-                {
-                    OS_printf("NOOP command failed!\n");
-                }
-            }
-            break;
-
-        case CMD_HK:
-            if (check_number_arguments(num_tokens, 1) == OS_SUCCESS)
-            {
-                status = GENERIC_CSS_RequestHK(Generic_cssUart.handle, &Generic_cssHK);
-                if (status == OS_SUCCESS)
-                {
-                    OS_printf("GENERIC_CSS_RequestHK command success\n");
-                }
-                else
-                {
-                    OS_printf("GENERIC_CSS_RequestHK command failed!\n");
-                }
-            }
-            break;
-
         case CMD_GENERIC_CSS:
-            if (check_number_arguments(num_tokens, 1) == OS_SUCCESS)
+            if (check_number_arguments(num_tokens, 0) == OS_SUCCESS)
             {
-                status = GENERIC_CSS_RequestData(Generic_cssUart.handle, &Generic_cssData);
+                status = GENERIC_CSS_RequestData(&Generic_CSSI2c, &Generic_CSSData);
                 if (status == OS_SUCCESS)
                 {
-                    OS_printf("GENERIC_CSS_RequestHK command success\n");
+                    OS_printf("GENERIC_CSS_RequestData command success\n");
                 }
                 else
                 {
-                    OS_printf("GENERIC_CSS_RequestHK command failed!\n");
-                }
-            }
-            break;
-
-        case CMD_CFG:
-            if (check_number_arguments(num_tokens, 1) == OS_SUCCESS)
-            {
-                config = atoi(&tokens[0]);
-                status = GENERIC_CSS_CommandDevice(Generic_cssUart.handle, GENERIC_CSS_DEVICE_CFG_CMD, config);
-                if (status == OS_SUCCESS)
-                {
-                    OS_printf("Configuration command success with value %d\n", config);
-                }
-                else
-                {
-                    OS_printf("Configuration command failed!\n");
+                    OS_printf("GENERIC_CSS_RequestData command failed!\n");
                 }
             }
             break;
@@ -191,19 +111,24 @@ int main(int argc, char *argv[])
     char* token_ptr;
     uint8_t run_status = OS_SUCCESS;
 
+    /* Initialize HWLIB */
+    #ifdef _NOS_ENGINE_LINK_
+        nos_init_link();
+    #endif
+
     /* Open device specific protocols */
-    Generic_cssUart.deviceString = GENERIC_CSS_CFG_STRING;
-    Generic_cssUart.handle = GENERIC_CSS_CFG_HANDLE;
-    Generic_cssUart.isOpen = PORT_CLOSED;
-    Generic_cssUart.baud = GENERIC_CSS_CFG_BAUDRATE_HZ;
-    status = uart_init_port(&Generic_cssUart);
+    Generic_CSSI2c.handle = GENERIC_CSS_CFG_HANDLE;
+    Generic_CSSI2c.isOpen = PORT_CLOSED;
+    Generic_CSSI2c.speed = GENERIC_CSS_CFG_BAUDRATE_HZ;
+    Generic_CSSI2c.addr = GENERIC_CSS_I2C_ADDRESS;
+    status = i2c_master_init(&Generic_CSSI2c);
     if (status == OS_SUCCESS)
     {
-        printf("UART device %s configured with baudrate %d \n", Generic_cssUart.deviceString, Generic_cssUart.baud);
+        printf("I2C device %d configured with speed %d \n", Generic_CSSI2c.handle, Generic_CSSI2c.speed);
     }
     else
     {
-        printf("UART device %s failed to initialize! \n", Generic_cssUart.deviceString);
+        printf("I2C device %d failed to initialize! \n", Generic_CSSI2c.handle);
         run_status = OS_ERROR;
     }
 
@@ -239,12 +164,16 @@ int main(int argc, char *argv[])
         if(num_input_tokens >= 0)
         {
             /* Process command */
-            run_status = process_command(cmd, num_input_tokens, token_ptr);
+            run_status = process_command(cmd, num_input_tokens, input_tokens);
         }
     }
 
     // Close the device 
-    uart_close_port(Generic_cssUart.handle);
+    i2c_master_close(&Generic_CSSI2c);
+
+    #ifdef _NOS_ENGINE_LINK_
+        nos_destroy_link();
+    #endif
 
     OS_printf("Cleanly exiting generic_css application...\n\n"); 
     return 1;
