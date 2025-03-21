@@ -314,6 +314,18 @@
      GENERIC_CSS_ProcessCommandPacket();
      UtAssert_True(EventTest.MatchCount == 0, "GENERIC_CSS_HK_ERR_EID not generated (%u)",
                    (unsigned int)EventTest.MatchCount);
+
+    /* Request_HK message id */
+    TestMsgId = CFE_SB_ValueToMsgId(GENERIC_CSS_REQ_HK_MID);
+    FcnCode   = GENERIC_CSS_REQ_DATA_TLM;
+    MsgSize   = sizeof(TestMsg.Noop);
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetMsgId), &TestMsgId, sizeof(TestMsgId), false);
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetMsgId), &TestMsgId, sizeof(TestMsgId), false);
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &FcnCode, sizeof(FcnCode), false);
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetSize), &MsgSize, sizeof(MsgSize), false);
+    GENERIC_CSS_ProcessCommandPacket();
+    UtAssert_True(EventTest.MatchCount == 0, "GENERIC_CSS_HK_ERR_EID not generated (%u)",
+                  (unsigned int)EventTest.MatchCount);
  
      
  }
@@ -437,6 +449,7 @@
  
  void Test_GENERIC_CSS_ReportDeviceTelemetry(void)
  {
+    GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_ENABLED;
      /*
       * Test Case For:
       * void Test_GENERIC_CSS_ReportDeviceTelemetry()
@@ -465,6 +478,8 @@
      UtAssert_True(UT_GetStubCount(UT_KEY(CFE_SB_TimeStampMsg)) == 1, "CFE_SB_TimeStampMsg() called once");
      UtAssert_True(MsgTimestamp == &GENERIC_CSS_AppData.HkTelemetryPkt.TlmHeader.Msg,
                    "CFE_SB_TimeStampMsg() address matches expected");
+
+    GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_DISABLED;
  }
  
  void Test_GENERIC_CSS_VerifyCmdLength(void)
