@@ -2,25 +2,27 @@ require 'cosmos'
 require 'cosmos/script'
 require 'mission_lib.rb'
 
-class LPT < Cosmos::Test
+class CSS_LPT < Cosmos::Test
   def setup
-      enable_TO_and_verify()
+    
   end
 
   def test_lpt
+    start("tests/generic_css_lpt_test.rb")
   end
 
   def teardown
-      cmd("CFS_RADIO TO_PAUSE_OUTPUT")
+
   end
 end
 
-class CPT < Cosmos::Test
+class CSS_CPT < Cosmos::Test
   def setup
       
   end
 
   def test_cpt
+    start("tests/generic_css_cpt_test.rb")
   end
 
   def teardown
@@ -28,11 +30,11 @@ class CPT < Cosmos::Test
   end
 end
 
-class Generic_css_Test < Cosmos::TestSuite
+class Generic_Css_Test < Cosmos::TestSuite
   def initialize
       super()
-      add_test('CPT')
-      add_test('LPT')
+      add_test('CSS_CPT')
+      add_test('CSS_LPT')
   end
 
   def setup
