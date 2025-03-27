@@ -113,19 +113,11 @@ initial_device_error_count = tlm("GENERIC_CSS GENERIC_CSS_HK_TLM DEVICE_ERR_COUN
 
 cmd("GENERIC_CSS GENERIC_CSS_REQ_DATA")
 
-svb0 = tlm("SIM_42_TRUTH SIM_42_TRUTH_DATA SVB_0")
-svb1 = tlm("SIM_42_TRUTH SIM_42_TRUTH_DATA SVB_1")
-svb2 = tlm("SIM_42_TRUTH SIM_42_TRUTH_DATA SVB_2")
+css_raw = tlm("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_N")
 
-css_alpha = tlm("GENERIC_CSS GENERIC_CSS_DATA_TLM GENERIC_CSS_ALPHA")
-css_beta = tlm("GENERIC_CSS GENERIC_CSS_DATA_TLM GENERIC_CSS_BETA")
-css_error = tlm("GENERIC_CSS GENERIC_CSS_DATA_TLM GENERIC_CSS_ERROR_CODE")
+adcs_percent_on = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTONN")
 
-truth_42_alpha = -Math.atan2(svb2, svb0)
-truth_42_beta = Math.atan2(svb1, svb0)
-
-truth_42_alpha_diff = (css_alpha - truth_42_alpha).abs()
-truth_42_beta_diff = (css_beta - truth_42_beta).abs()
+adcs_percent_on_diff = (css_raw - adcs_percent_on).abs()
 diff_margin = 0.025
 
 wait_check("GENERIC_CSS GENERIC_CSS_HK_TLM CMD_ERR_COUNT == #{initial_error_count}", 30)
