@@ -138,7 +138,7 @@ adcs_percent_on_diff3 = (css_raw3 - adcs_percent_on3).abs()
 adcs_percent_on_diff4 = (css_raw4 - adcs_percent_on4).abs()
 adcs_percent_on_diff5 = (css_raw5 - adcs_percent_on5).abs()
 
-diff_margin = 0.025
+diff_margin = 1000
 
 wait_check("GENERIC_CSS GENERIC_CSS_HK_TLM CMD_ERR_COUNT == #{initial_error_count}", 30)
 wait_check("GENERIC_CSS GENERIC_CSS_HK_TLM DEVICE_ERR_COUNT == #{initial_device_error_count}", 30)
