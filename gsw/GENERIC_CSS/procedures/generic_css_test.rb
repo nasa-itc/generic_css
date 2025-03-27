@@ -30,7 +30,7 @@ class CSS_CPT < Cosmos::Test
   end
 end
 
-class Generic_Css_Test < Cosmos::TestSuite
+class Generic_css_Test < Cosmos::TestSuite
   def initialize
       super()
       add_test('CSS_CPT')
