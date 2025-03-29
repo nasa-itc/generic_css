@@ -131,14 +131,14 @@ adcs_percent_on4 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON4")
 adcs_percent_on5 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON5")
 
 
-adcs_percent_on_diff0 = (css_raw0 - adcs_percent_on0).abs()
-adcs_percent_on_diff1 = (css_raw1 - adcs_percent_on1).abs()
-adcs_percent_on_diff2 = (css_raw2 - adcs_percent_on2).abs()
-adcs_percent_on_diff3 = (css_raw3 - adcs_percent_on3).abs()
-adcs_percent_on_diff4 = (css_raw4 - adcs_percent_on4).abs()
-adcs_percent_on_diff5 = (css_raw5 - adcs_percent_on5).abs()
+adcs_percent_on_diff0 = (css_raw0/1000 - adcs_percent_on0).abs()
+adcs_percent_on_diff1 = (css_raw1/1000 - adcs_percent_on1).abs()
+adcs_percent_on_diff2 = (css_raw2/1000 - adcs_percent_on2).abs()
+adcs_percent_on_diff3 = (css_raw3/1000 - adcs_percent_on3).abs()
+adcs_percent_on_diff4 = (css_raw4/1000 - adcs_percent_on4).abs()
+adcs_percent_on_diff5 = (css_raw5/1000 - adcs_percent_on5).abs()
 
-diff_margin = 1000
+diff_margin = 0.1
 
 wait_check("GENERIC_CSS GENERIC_CSS_HK_TLM CMD_ERR_COUNT == #{initial_error_count}", 30)
 wait_check("GENERIC_CSS GENERIC_CSS_HK_TLM DEVICE_ERR_COUNT == #{initial_device_error_count}", 30)
