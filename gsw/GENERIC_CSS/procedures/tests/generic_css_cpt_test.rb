@@ -134,12 +134,12 @@ adcs_percent_on_diff3 = (css_raw3/1000 - adcs_percent_on3).abs()
 adcs_percent_on_diff4 = (css_raw4/1000 - adcs_percent_on4).abs()
 adcs_percent_on_diff5 = (css_raw5/1000 - adcs_percent_on5).abs()
 
-diff_margin0 = 0.75
-diff_margin1 = 0.75
-diff_margin2 = 0.75
-diff_margin3 = 0.75
-diff_margin4 = 0.75
-diff_margin5 = 0.75
+diff_margin0 = 1
+diff_margin1 = 0.5
+diff_margin2 = 0.1
+diff_margin3 = 1
+diff_margin4 = 0.1
+diff_margin5 = 0.1
 
 wait_check("GENERIC_CSS GENERIC_CSS_HK_TLM CMD_ERR_COUNT == #{initial_error_count}", 30)
 wait_check("GENERIC_CSS GENERIC_CSS_HK_TLM DEVICE_ERR_COUNT == #{initial_device_error_count}", 30)
@@ -150,7 +150,6 @@ wait_check_expression("adcs_percent_on_diff2 <= diff_margin2 # #{adcs_percent_on
 wait_check_expression("adcs_percent_on_diff3 <= diff_margin3 # #{adcs_percent_on_diff3} >= #{diff_margin3}", 15)
 wait_check_expression("adcs_percent_on_diff4 <= diff_margin4 # #{adcs_percent_on_diff4} >= #{diff_margin4}", 15)
 wait_check_expression("adcs_percent_on_diff5 <= diff_margin5 # #{adcs_percent_on_diff5} >= #{diff_margin5}", 15)
-
 
 sleep(5)
 
