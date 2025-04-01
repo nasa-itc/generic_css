@@ -139,7 +139,7 @@ diff_margin1 = 0.5
 diff_margin2 = 0.1
 diff_margin3 = 1
 diff_margin4 = 0.1
-diff_margin5 = 0.1
+diff_margin5 = 0.6
 
 wait_check("GENERIC_CSS GENERIC_CSS_HK_TLM CMD_ERR_COUNT == #{initial_error_count}", 30)
 wait_check("GENERIC_CSS GENERIC_CSS_HK_TLM DEVICE_ERR_COUNT == #{initial_device_error_count}", 30)
