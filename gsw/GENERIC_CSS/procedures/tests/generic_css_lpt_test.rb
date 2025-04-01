@@ -144,12 +144,12 @@ diff_margin5 = 0.1
 wait_check("GENERIC_CSS GENERIC_CSS_HK_TLM CMD_ERR_COUNT == #{initial_error_count}", 30)
 wait_check("GENERIC_CSS GENERIC_CSS_HK_TLM DEVICE_ERR_COUNT == #{initial_device_error_count}", 30)
 
-wait_check_expression("adcs_percent_on_diff0 <= diff_margin0 # #{adcs_percent_on_diff0} >= #{diff_margin0}", 15)
-wait_check_expression("adcs_percent_on_diff1 <= diff_margin1 # #{adcs_percent_on_diff1} >= #{diff_margin1}", 15)
-wait_check_expression("adcs_percent_on_diff2 <= diff_margin2 # #{adcs_percent_on_diff2} >= #{diff_margin2}", 15)
-wait_check_expression("adcs_percent_on_diff3 <= diff_margin3 # #{adcs_percent_on_diff3} >= #{diff_margin3}", 15)
-wait_check_expression("adcs_percent_on_diff4 <= diff_margin4 # #{adcs_percent_on_diff4} >= #{diff_margin4}", 15)
-wait_check_expression("adcs_percent_on_diff5 <= diff_margin5 # #{adcs_percent_on_diff5} >= #{diff_margin5}", 15)
+wait_check_expression("adcs_percent_on_diff0 <= diff_margin0 # #{adcs_percent_on_diff0} <= #{diff_margin0}", 15)
+wait_check_expression("adcs_percent_on_diff1 <= diff_margin1 # #{adcs_percent_on_diff1} <= #{diff_margin1}", 15)
+wait_check_expression("adcs_percent_on_diff2 <= diff_margin2 # #{adcs_percent_on_diff2} <= #{diff_margin2}", 15)
+wait_check_expression("adcs_percent_on_diff3 <= diff_margin3 # #{adcs_percent_on_diff3} <= #{diff_margin3}", 15)
+wait_check_expression("adcs_percent_on_diff4 <= diff_margin4 # #{adcs_percent_on_diff4} <= #{diff_margin4}", 15)
+wait_check_expression("adcs_percent_on_diff5 <= diff_margin5 # #{adcs_percent_on_diff5} <= #{diff_margin5}", 15)
 
 sleep(5)
 
