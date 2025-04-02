@@ -113,43 +113,33 @@ initial_device_error_count = tlm("GENERIC_CSS GENERIC_CSS_HK_TLM DEVICE_ERR_COUN
 
 cmd("GENERIC_CSS GENERIC_CSS_REQ_DATA")
 
-css_raw0 = tlm("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_0")
-css_raw1 = tlm("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_1")
-css_raw2 = tlm("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_2")
-css_raw3 = tlm("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_3")
-css_raw4 = tlm("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_4")
-css_raw5 = tlm("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_5")
-
+diff_margin = 50
 adcs_percent_on0 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON0")
+adcs_adjusted_0 = adcs_percent_on0*1000
+wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_0", adcs_adjusted_0, diff_margin, 15)
+
 adcs_percent_on1 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON1")
+adcs_adjusted_1 = adcs_percent_on1*1000
+wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_1", adcs_adjusted_1, diff_margin, 15)
+
 adcs_percent_on2 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON2")
+adcs_adjusted_2 = adcs_percent_on2*1000
+wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_2", adcs_adjusted_2, diff_margin, 15)
+
 adcs_percent_on3 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON3")
+adcs_adjusted_3 = adcs_percent_on3*1000
+wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_3", adcs_adjusted_3, diff_margin, 15)
+
 adcs_percent_on4 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON4")
-adcs_percent_on5 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON5")
+adcs_adjusted_4 = adcs_percent_on4*1000
+wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_4", adcs_adjusted_4, diff_margin, 15)
 
-adcs_percent_on_diff0 = (css_raw0/1000 - adcs_percent_on0).abs()
-adcs_percent_on_diff1 = (css_raw1/1000 - adcs_percent_on1).abs()
-adcs_percent_on_diff2 = (css_raw2/1000 - adcs_percent_on2).abs()
-adcs_percent_on_diff3 = (css_raw3/1000 - adcs_percent_on3).abs()
-adcs_percent_on_diff4 = (css_raw4/1000 - adcs_percent_on4).abs()
-adcs_percent_on_diff5 = (css_raw5/1000 - adcs_percent_on5).abs()
-
-diff_margin0 = 1
-diff_margin1 = 0.5
-diff_margin2 = 0.1
-diff_margin3 = 1
-diff_margin4 = 0.1
-diff_margin5 = 0.6
+adcs_percent_on5 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON4")
+adcs_adjusted_5 = adcs_percent_on5*1000
+wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_5", adcs_adjusted_5, diff_margin, 15)
 
 wait_check("GENERIC_CSS GENERIC_CSS_HK_TLM CMD_ERR_COUNT == #{initial_error_count}", 30)
 wait_check("GENERIC_CSS GENERIC_CSS_HK_TLM DEVICE_ERR_COUNT == #{initial_device_error_count}", 30)
-
-wait_check_expression("adcs_percent_on_diff0 <= diff_margin0 # #{adcs_percent_on_diff0} <= #{diff_margin0}", 15)
-wait_check_expression("adcs_percent_on_diff1 <= diff_margin1 # #{adcs_percent_on_diff1} <= #{diff_margin1}", 15)
-wait_check_expression("adcs_percent_on_diff2 <= diff_margin2 # #{adcs_percent_on_diff2} <= #{diff_margin2}", 15)
-wait_check_expression("adcs_percent_on_diff3 <= diff_margin3 # #{adcs_percent_on_diff3} <= #{diff_margin3}", 15)
-wait_check_expression("adcs_percent_on_diff4 <= diff_margin4 # #{adcs_percent_on_diff4} <= #{diff_margin4}", 15)
-wait_check_expression("adcs_percent_on_diff5 <= diff_margin5 # #{adcs_percent_on_diff5} <= #{diff_margin5}", 15)
 
 sleep(5)
 
