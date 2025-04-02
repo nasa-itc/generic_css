@@ -113,7 +113,7 @@ initial_device_error_count = tlm("GENERIC_CSS GENERIC_CSS_HK_TLM DEVICE_ERR_COUN
 
 cmd("GENERIC_CSS GENERIC_CSS_REQ_DATA")
 
-diff_margin = 50
+diff_margin = 5
 adcs_percent_on0 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON0")
 adcs_adjusted_0 = adcs_percent_on0*1000
 wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_0", adcs_adjusted_0, diff_margin, 15)
@@ -134,7 +134,7 @@ adcs_percent_on4 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON4")
 adcs_adjusted_4 = adcs_percent_on4*1000
 wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_4", adcs_adjusted_4, diff_margin, 15)
 
-adcs_percent_on5 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON4")
+adcs_percent_on5 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON5")
 adcs_adjusted_5 = adcs_percent_on5*1000
 wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_5", adcs_adjusted_5, diff_margin, 15)
 
