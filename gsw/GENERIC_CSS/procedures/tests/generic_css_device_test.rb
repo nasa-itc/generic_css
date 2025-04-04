@@ -21,8 +21,8 @@ GENERIC_CSS_TEST_LOOP_COUNT.times do |n|
     cmd_err_cnt = tlm("GENERIC_CSS GENERIC_CSS_HK_TLM CMD_ERR_COUNT")
     cmd("GENERIC_CSS GENERIC_CSS_DISABLE_CC")
     get_generic_css_hk()
-    #check("GENERIC_CSS GENERIC_CSS_HK_TLM CMD_COUNT == #{cmd_cnt}")
-   # check("GENERIC_CSS GENERIC_CSS_HK_TLM CMD_ERR_COUNT == #{cmd_err_cnt+1}")
+    check("GENERIC_CSS GENERIC_CSS_HK_TLM CMD_COUNT == #{cmd_cnt}")
+    check("GENERIC_CSS GENERIC_CSS_HK_TLM CMD_ERR_COUNT == #{cmd_err_cnt+1}")
 
     # Enable
     enable_generic_css()
@@ -35,8 +35,8 @@ GENERIC_CSS_TEST_LOOP_COUNT.times do |n|
     cmd_err_cnt = tlm("GENERIC_CSS GENERIC_CSS_HK_TLM CMD_ERR_COUNT")
     cmd("GENERIC_CSS GENERIC_CSS_ENABLE_CC")
     get_generic_css_hk()
-    #check("GENERIC_CSS GENERIC_CSS_HK_TLM CMD_COUNT == #{cmd_cnt}")
-    #check("GENERIC_CSS GENERIC_CSS_HK_TLM CMD_ERR_COUNT == #{cmd_err_cnt+1}")
+    check("GENERIC_CSS GENERIC_CSS_HK_TLM CMD_COUNT == #{cmd_cnt}")
+    check("GENERIC_CSS GENERIC_CSS_HK_TLM CMD_ERR_COUNT == #{cmd_err_cnt+1}")
 
     # Reconfirm data remains as expected
     confirm_generic_css_data_loop()

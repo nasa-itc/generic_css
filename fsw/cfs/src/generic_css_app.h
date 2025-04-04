@@ -89,6 +89,7 @@ void  GENERIC_CSS_ReportDeviceTelemetry(void);
 void  GENERIC_CSS_ResetCounters(void);
 void  GENERIC_CSS_Enable(void);
 void  GENERIC_CSS_Disable(void);
+void  GENERIC_CSS_Configure(void);
 int32 GENERIC_CSS_VerifyCmdLength(CFE_MSG_Message_t *msg, uint16 expected_length);
 
 #endif /* _GENERIC_CSS_APP_H_ */

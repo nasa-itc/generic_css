@@ -26,7 +26,7 @@ class GENERIC_CSS_Automated_Scenario_Test < Cosmos::Test
   end
 
   def test_cpt
-      #start("tests/generic_css_ast_test.rb")
+      start("tests/generic_css_ast_test.rb")
   end
 
   def teardown

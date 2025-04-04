@@ -13,8 +13,10 @@
 */
 #include "device_cfg.h"
 #include "hwlib.h"
-#include "generic_css_platform_cfg.h"
 
+#ifndef GENERIC_CSS_CFG
+#include "generic_css_platform_cfg.h"
+#endif
 /*
 ** Type definitions
 */

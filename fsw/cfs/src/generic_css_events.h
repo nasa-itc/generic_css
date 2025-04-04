@@ -38,7 +38,9 @@
 #define GENERIC_CSS_REQ_HK_ERR_EID     31
 
 /* Device specific telemetry event IDs */
-#define GENERIC_CSS_REQ_DATA_ERR_EID 32
+#define GENERIC_CSS_REQ_DATA_ERR_EID        32
+#define GENERIC_CSS_REQ_DATA_STATUS_ERR_EID 33
+
 
 /* Hardware protocol event IDs */
 #define GENERIC_CSS_I2C_INIT_ERR_EID 40

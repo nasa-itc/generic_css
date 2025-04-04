@@ -256,8 +256,17 @@ void GENERIC_CSS_ProcessGroundCommand(void)
             */
             if (GENERIC_CSS_VerifyCmdLength(GENERIC_CSS_AppData.MsgPtr, sizeof(GENERIC_CSS_NoArgs_cmd_t)) == OS_SUCCESS)
             {
-                /* Second, send EVS event on successful receipt ground commands*/
-                CFE_EVS_SendEvent(GENERIC_CSS_CMD_NOOP_INF_EID, CFE_EVS_EventType_INFORMATION,
+
+                /* Do any necessary checks, none for a NOOP */
+
+                /* Increment command success or error counter, NOOP can only be successful */
+                GENERIC_CSS_AppData.HkTelemetryPkt.CommandCount++;
+
+                /* Do the action, none for a NOOP */
+
+                /* Increment device success or error counter, none for NOOP as application only */
+
+                /* Send event success or failure to the console, NOOP can only be successful */                CFE_EVS_SendEvent(GENERIC_CSS_CMD_NOOP_INF_EID, CFE_EVS_EventType_INFORMATION,
                                   "GENERIC_CSS: NOOP command received");
                 /* Third, do the desired command action if applicable, in the case of NOOP it is no operation */
             }
@@ -415,6 +424,9 @@ void GENERIC_CSS_Enable(void)
     /* Check that device is disabled */
     if (GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled == GENERIC_CSS_DEVICE_DISABLED)
     {
+        /* Increment command success counter */
+        GENERIC_CSS_AppData.HkTelemetryPkt.CommandCount++;
+
         /* Open device specific protocols */
         status = i2c_master_init(&GENERIC_CSS_AppData.Generic_cssI2c);
         if (status == OS_SUCCESS)
@@ -447,6 +459,9 @@ void GENERIC_CSS_Disable(void)
     /* Check that device is enabled */
     if (GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled == GENERIC_CSS_DEVICE_ENABLED)
     {
+        /* Increment command success counter */
+        GENERIC_CSS_AppData.HkTelemetryPkt.CommandCount++;
+
         GENERIC_CSS_AppData.HkTelemetryPkt.DeviceCount++;
         GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_DISABLED;
         CFE_EVS_SendEvent(GENERIC_CSS_DISABLE_INF_EID, CFE_EVS_EventType_INFORMATION, "GENERIC_CSS: Device disabled");
@@ -471,12 +486,7 @@ int32 GENERIC_CSS_VerifyCmdLength(CFE_MSG_Message_t *msg, uint16 expected_length
     size_t            actual_length = 0;
 
     CFE_MSG_GetSize(msg, &actual_length);
-    if (expected_length == actual_length)
-    {
-        /* Increment the command counter upon receipt of an invalid command */
-        GENERIC_CSS_AppData.HkTelemetryPkt.CommandCount++;
-    }
-    else
+    if (expected_length != actual_length)
     {
         CFE_MSG_GetMsgId(msg, &msg_id);
         CFE_MSG_GetFcnCode(msg, &cmd_code);
