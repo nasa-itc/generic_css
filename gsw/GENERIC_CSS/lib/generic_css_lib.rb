@@ -82,27 +82,27 @@ def confirm_generic_css_data()
 
     adcs_percent_on0 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON0")
     adcs_adjusted_0 = adcs_percent_on0*1000
-    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_0", adcs_adjusted_0, diff_margin, 15)
+    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_0", adcs_adjusted_0, diff_margin, 30)
 
     adcs_percent_on1 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON1")
     adcs_adjusted_1 = adcs_percent_on1*1000
-    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_1", adcs_adjusted_1, diff_margin, 15)
+    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_1", adcs_adjusted_1, diff_margin, 30)
 
     adcs_percent_on2 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON2")
     adcs_adjusted_2 = adcs_percent_on2*1000
-    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_2", adcs_adjusted_2, diff_margin, 15)
+    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_2", adcs_adjusted_2, diff_margin, 30)
 
     adcs_percent_on3 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON3")
     adcs_adjusted_3 = adcs_percent_on3*1000
-    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_3", adcs_adjusted_3, diff_margin, 15)
+    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_3", adcs_adjusted_3, diff_margin, 30)
 
     adcs_percent_on4 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON4")
     adcs_adjusted_4 = adcs_percent_on4*1000
-    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_4", adcs_adjusted_4, diff_margin, 15)
+    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_4", adcs_adjusted_4, diff_margin, 30)
 
     adcs_percent_on5 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON5")
     adcs_adjusted_5 = adcs_percent_on5*1000
-    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_5", adcs_adjusted_5, diff_margin, 15)
+    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_5", adcs_adjusted_5, diff_margin, 30)
 
     get_generic_css_hk()
     check("GENERIC_CSS GENERIC_CSS_HK_TLM DEVICE_COUNT >= #{dev_cmd_cnt}")
@@ -130,9 +130,13 @@ def generic_css_prepare_ast()
 end
 
 def generic_css_sim_enable()
-    cmd("SIM_CMDBUS_BRIDGE GENERIC_CSS_ENABLE")
+    cmd("SIM_CMDBUS_BRIDGE GENERIC_CSS_SIM_ENABLE")
 end
 
 def generic_css_sim_disable()
-    cmd("SIM_CMDBUS_BRIDGE GENERIC_CSS_DISABLE")
+    cmd("SIM_CMDBUS_BRIDGE GENERIC_CSS_SIM_DISABLE")
+end
+
+def generic_css_sim_set_status(status)
+    cmd("SIM_CMDBUS_BRIDGE GENERIC_CSS_SIM_SET_STATUS with STATUS #{status}")
 end

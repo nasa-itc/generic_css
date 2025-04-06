@@ -444,7 +444,8 @@ void GENERIC_CSS_Enable(void)
     }
     else
     {
-        GENERIC_CSS_AppData.HkTelemetryPkt.DeviceErrorCount++;
+        /* Increment the command error counter upon receipt of an invalid command */
+        GENERIC_CSS_AppData.HkTelemetryPkt.CommandErrorCount++;;
         CFE_EVS_SendEvent(GENERIC_CSS_ENABLE_ERR_EID, CFE_EVS_EventType_ERROR,
                           "GENERIC_CSS: Device enable failed, already enabled");
     }
@@ -468,7 +469,8 @@ void GENERIC_CSS_Disable(void)
     }
     else
     {
-        GENERIC_CSS_AppData.HkTelemetryPkt.DeviceErrorCount++;
+        /* Increment the command error counter upon receipt of an invalid command */
+        GENERIC_CSS_AppData.HkTelemetryPkt.CommandErrorCount++;
         CFE_EVS_SendEvent(GENERIC_CSS_DISABLE_ERR_EID, CFE_EVS_EventType_ERROR,
                           "GENERIC_CSS: Device disable failed, already disabled");
     }
