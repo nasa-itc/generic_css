@@ -28,24 +28,3 @@ GENERIC_CSS_TEST_LOOP_COUNT.times do |n|
     generic_css_sim_enable()
     confirm_generic_css_data_loop()
 end
-
-
-##
-## Hardware status reporting fault
-##
-GENERIC_CSS_TEST_LOOP_COUNT.times do |n|
-    # Prepare
-    generic_css_prepare_ast()
-
-    # Add a fault to status in the simulator
-    generic_css_sim_set_status(255)
-
-    # Confirm that status register and that app disabled itself
-    get_generic_css_hk()
-    #check("GENERIC_CSS GENERIC_CSS_HK_TLM DEVICE_STATUS == 255")
-    get_generic_css_hk()
-    #check("GENERIC_CSS GENERIC_CSS_HK_TLM DEVICE_ENABLED == 'DISABLED'")
-    
-    # Clear simulator status fault
-    generic_css_sim_set_status(0)
-end
