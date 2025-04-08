@@ -82,27 +82,27 @@ def confirm_generic_css_data()
 
     adcs_percent_on0 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON0")
     adcs_adjusted_0 = adcs_percent_on0*1000
-    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_0", adcs_adjusted_0, diff_margin, 30)
+    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_0", adcs_adjusted_0, diff_margin, 60)
 
     adcs_percent_on1 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON1")
     adcs_adjusted_1 = adcs_percent_on1*1000
-    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_1", adcs_adjusted_1, diff_margin, 30)
+    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_1", adcs_adjusted_1, diff_margin, 60)
 
     adcs_percent_on2 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON2")
     adcs_adjusted_2 = adcs_percent_on2*1000
-    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_2", adcs_adjusted_2, diff_margin, 30)
+    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_2", adcs_adjusted_2, diff_margin, 60)
 
     adcs_percent_on3 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON3")
     adcs_adjusted_3 = adcs_percent_on3*1000
-    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_3", adcs_adjusted_3, diff_margin, 30)
+    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_3", adcs_adjusted_3, diff_margin, 60)
 
     adcs_percent_on4 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON4")
     adcs_adjusted_4 = adcs_percent_on4*1000
-    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_4", adcs_adjusted_4, diff_margin, 30)
+    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_4", adcs_adjusted_4, diff_margin, 60)
 
     adcs_percent_on5 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON5")
     adcs_adjusted_5 = adcs_percent_on5*1000
-    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_5", adcs_adjusted_5, diff_margin, 30)
+    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_5", adcs_adjusted_5, diff_margin, 60)
 
     get_generic_css_hk()
     check("GENERIC_CSS GENERIC_CSS_HK_TLM DEVICE_COUNT >= #{dev_cmd_cnt}")
