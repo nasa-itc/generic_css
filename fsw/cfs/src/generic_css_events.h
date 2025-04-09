@@ -29,6 +29,7 @@
 #define GENERIC_CSS_CMD_DISABLE_INF_EID 16
 #define GENERIC_CSS_DISABLE_INF_EID     17
 #define GENERIC_CSS_DISABLE_ERR_EID     18
+#define GENERIC_CSS_I2C_CLOSE_ERR_EID   19
 
 /* Device specific command event IDs */
 /* None */

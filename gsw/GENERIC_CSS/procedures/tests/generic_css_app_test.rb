@@ -53,7 +53,7 @@ GENERIC_CSS_TEST_LOOP_COUNT.times do |n|
     check("GENERIC_CSS GENERIC_CSS_HK_TLM CMD_ERR_COUNT == #{cmd_err_cnt+1}")
 end
 
-for n in 6..(5 + GENERIC_CSS_TEST_LOOP_COUNT)
+for n in 4..(4 + GENERIC_CSS_TEST_LOOP_COUNT)
     # Bad command codes
     cmd_cnt = tlm("GENERIC_CSS GENERIC_CSS_HK_TLM CMD_COUNT")
     cmd_err_cnt = tlm("GENERIC_CSS GENERIC_CSS_HK_TLM CMD_ERR_COUNT")

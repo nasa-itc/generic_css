@@ -9,6 +9,7 @@ GENERIC_CSS_CMD_SLEEP = 0.25
 GENERIC_CSS_RESPONSE_TIMEOUT = 5
 GENERIC_CSS_TEST_LOOP_COUNT = 1
 GENERIC_CSS_DEVICE_LOOP_COUNT = 5
+GENERIC_CSS_DEVICE_TRUTH_MARGIN = 100
 
 #
 # Functions
@@ -76,34 +77,66 @@ def confirm_generic_css_data()
     dev_cmd_cnt = tlm("GENERIC_CSS GENERIC_CSS_HK_TLM DEVICE_COUNT")
     dev_cmd_err_cnt = tlm("GENERIC_CSS GENERIC_CSS_HK_TLM DEVICE_ERR_COUNT")
     
-    get_generic_css_data()
-    # Note these checks assume default simulator configuration
-    diff_margin = 5
+    # Note these checks assume truth data from 42 is available, and that the spacecraft is not rapidly tumbling
+    # The CSS orientations were taken from the ./cfg/InOut/SC_NOS3.txt
+    in_sun = tlm("SIM_42_TRUTH SIM_42_TRUTH_DATA IN_SUN")
+    if(in_sun > 0)
+        # CSS 0,  1, 0, 0
+        svb_0 = tlm("SIM_42_TRUTH SIM_42_TRUTH_DATA SVB_0")
+        get_generic_css_data()
+        if(svb_0 > 0)
+            check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_0", svb_0 * 1000, GENERIC_CSS_DEVICE_TRUTH_MARGIN)
+        else
+            check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_0", 0, GENERIC_CSS_DEVICE_TRUTH_MARGIN)
+        end
 
-    adcs_percent_on0 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON0")
-    adcs_adjusted_0 = adcs_percent_on0*1000
-    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_0", adcs_adjusted_0, diff_margin, 60)
+        # CSS 1, -1, 0, 0
+        svb_0 = tlm("SIM_42_TRUTH SIM_42_TRUTH_DATA SVB_0")
+        get_generic_css_data()
+        if(svb_0 < 0)
+            check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_1", svb_0 * -1000, GENERIC_CSS_DEVICE_TRUTH_MARGIN)
+        else
+            check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_1", 0, GENERIC_CSS_DEVICE_TRUTH_MARGIN)
+        end
 
-    adcs_percent_on1 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON1")
-    adcs_adjusted_1 = adcs_percent_on1*1000
-    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_1", adcs_adjusted_1, diff_margin, 60)
+        # CSS 2,  0, 1, 0
+        svb_1 = tlm("SIM_42_TRUTH SIM_42_TRUTH_DATA SVB_1")
+        get_generic_css_data()
+        if(svb_1 > 0)
+            check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_2", svb_1 * 1000, GENERIC_CSS_DEVICE_TRUTH_MARGIN)
+        else
+            check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_2", 0, GENERIC_CSS_DEVICE_TRUTH_MARGIN)
+        end
 
-    adcs_percent_on2 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON2")
-    adcs_adjusted_2 = adcs_percent_on2*1000
-    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_2", adcs_adjusted_2, diff_margin, 60)
+        # CSS 3,  0,-1, 0
+        svb_1 = tlm("SIM_42_TRUTH SIM_42_TRUTH_DATA SVB_1")
+        get_generic_css_data()
+        if(svb_1 < 0)
+            check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_3", svb_1 * -1000, GENERIC_CSS_DEVICE_TRUTH_MARGIN)
+        else
+            check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_3", 0, GENERIC_CSS_DEVICE_TRUTH_MARGIN)
+        end
 
-    adcs_percent_on3 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON3")
-    adcs_adjusted_3 = adcs_percent_on3*1000
-    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_3", adcs_adjusted_3, diff_margin, 60)
+        # CSS 4,  0, 0, 1
+        svb_2 = tlm("SIM_42_TRUTH SIM_42_TRUTH_DATA SVB_2")
+        get_generic_css_data()
+        if(svb_2 > 0)
+            check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_4", svb_2 * 1000, GENERIC_CSS_DEVICE_TRUTH_MARGIN)
+        else
+            check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_4", 0, GENERIC_CSS_DEVICE_TRUTH_MARGIN)
+        end
 
-    adcs_percent_on4 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON4")
-    adcs_adjusted_4 = adcs_percent_on4*1000
-    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_4", adcs_adjusted_4, diff_margin, 60)
+        # CSS 5,  0, 0,-1
+        svb_2 = tlm("SIM_42_TRUTH SIM_42_TRUTH_DATA SVB_2")
+        get_generic_css_data()
+        if(svb_2 < 0)
+            check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_5", svb_2 * -1000, GENERIC_CSS_DEVICE_TRUTH_MARGIN)
+        else
+            check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_5", 0, GENERIC_CSS_DEVICE_TRUTH_MARGIN)
+        end
+    end
 
-    adcs_percent_on5 = tlm("GENERIC_ADCS GENERIC_ADCS_DI PERCENTON5")
-    adcs_adjusted_5 = adcs_percent_on5*1000
-    wait_check_tolerance("GENERIC_CSS GENERIC_CSS_DATA_TLM RAW_CSS_5", adcs_adjusted_5, diff_margin, 60)
-
+    # Confirm no errors occurred
     get_generic_css_hk()
     check("GENERIC_CSS GENERIC_CSS_HK_TLM DEVICE_COUNT >= #{dev_cmd_cnt}")
     check("GENERIC_CSS GENERIC_CSS_HK_TLM DEVICE_ERR_COUNT == #{dev_cmd_err_cnt}")
