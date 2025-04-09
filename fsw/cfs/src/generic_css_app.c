@@ -266,7 +266,7 @@ void GENERIC_CSS_ProcessGroundCommand(void)
                 /* Increment device success or error counter, none for NOOP as application only */
 
                 /* Send event success or failure to the console, NOOP can only be successful */ CFE_EVS_SendEvent(
-                GENERIC_CSS_CMD_NOOP_INF_EID, CFE_EVS_EventType_INFORMATION, "GENERIC_CSS: NOOP command received");
+                    GENERIC_CSS_CMD_NOOP_INF_EID, CFE_EVS_EventType_INFORMATION, "GENERIC_CSS: NOOP command received");
                 /* Third, do the desired command action if applicable, in the case of NOOP it is no operation */
             }
             break;
