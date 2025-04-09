@@ -261,7 +261,7 @@ void GENERIC_CSS_ProcessGroundCommand(void)
 
                 /* Increment device success or error counter, none for NOOP as application only */
 
-                /* Send event success or failure to the console, NOOP can only be successful */                
+                /* Send event success or failure to the console, NOOP can only be successful */
                 CFE_EVS_SendEvent(GENERIC_CSS_CMD_NOOP_INF_EID, CFE_EVS_EventType_INFORMATION,
                                   "GENERIC_CSS: NOOP command received");
                 /* Third, do the desired command action if applicable, in the case of NOOP it is no operation */
@@ -434,8 +434,7 @@ void GENERIC_CSS_Enable(void)
             GENERIC_CSS_AppData.HkTelemetryPkt.DeviceCount++;
 
             /* Send device event success to the console */
-            CFE_EVS_SendEvent(GENERIC_CSS_ENABLE_INF_EID, CFE_EVS_EventType_INFORMATION, 
-                              "GENERIC_CSS: Device enabled");
+            CFE_EVS_SendEvent(GENERIC_CSS_ENABLE_INF_EID, CFE_EVS_EventType_INFORMATION, "GENERIC_CSS: Device enabled");
         }
         else
         {
@@ -450,7 +449,8 @@ void GENERIC_CSS_Enable(void)
     else
     {
         /* Increment command error count */
-        GENERIC_CSS_AppData.HkTelemetryPkt.CommandErrorCount++;;
+        GENERIC_CSS_AppData.HkTelemetryPkt.CommandErrorCount++;
+        ;
 
         /* Send command event failure to the console */
         CFE_EVS_SendEvent(GENERIC_CSS_ENABLE_ERR_EID, CFE_EVS_EventType_ERROR,
@@ -482,7 +482,7 @@ void GENERIC_CSS_Disable(void)
             GENERIC_CSS_AppData.HkTelemetryPkt.DeviceCount++;
 
             /* Send device event success to the console */
-            CFE_EVS_SendEvent(GENERIC_CSS_DISABLE_INF_EID, CFE_EVS_EventType_INFORMATION, 
+            CFE_EVS_SendEvent(GENERIC_CSS_DISABLE_INF_EID, CFE_EVS_EventType_INFORMATION,
                               "GENERIC_CSS: Device disabled");
         }
         else
@@ -492,7 +492,7 @@ void GENERIC_CSS_Disable(void)
 
             /* Send device event failure to the console */
             CFE_EVS_SendEvent(GENERIC_CSS_I2C_CLOSE_ERR_EID, CFE_EVS_EventType_ERROR,
-                            "GENERIC_CSS: Device I2C close error %d", status);
+                              "GENERIC_CSS: Device I2C close error %d", status);
         }
     }
     else
@@ -502,7 +502,7 @@ void GENERIC_CSS_Disable(void)
 
         /* Send command event failure to the console */
         CFE_EVS_SendEvent(GENERIC_CSS_DISABLE_ERR_EID, CFE_EVS_EventType_ERROR,
-                        "GENERIC_CSS: Device disable failed, already disabled");
+                          "GENERIC_CSS: Device disable failed, already disabled");
     }
     return;
 }
