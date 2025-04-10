@@ -171,10 +171,6 @@ int32 GENERIC_CSS_AppInit(void)
     ** Note that counters are excluded as they were reset in the previous code block
     */
     GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_DISABLED;
-    GENERIC_CSS_AppData.Generic_cssI2c.handle        = GENERIC_CSS_CFG_HANDLE;
-    GENERIC_CSS_AppData.Generic_cssI2c.isOpen        = PORT_CLOSED;
-    GENERIC_CSS_AppData.Generic_cssI2c.speed         = GENERIC_CSS_CFG_BAUDRATE_HZ;
-    GENERIC_CSS_AppData.Generic_cssI2c.addr          = GENERIC_CSS_I2C_ADDRESS;
 
     /*
      ** Send an information event that the app has initialized.
@@ -256,7 +252,16 @@ void GENERIC_CSS_ProcessGroundCommand(void)
             */
             if (GENERIC_CSS_VerifyCmdLength(GENERIC_CSS_AppData.MsgPtr, sizeof(GENERIC_CSS_NoArgs_cmd_t)) == OS_SUCCESS)
             {
-                /* Second, send EVS event on successful receipt ground commands*/
+
+                /* Do any necessary checks, none for a NOOP */
+
+                /* Increment command success or error counter, NOOP can only be successful */
+                GENERIC_CSS_AppData.HkTelemetryPkt.CommandCount++;
+                /* Do the action, none for a NOOP */
+
+                /* Increment device success or error counter, none for NOOP as application only */
+
+                /* Send event success or failure to the console, NOOP can only be successful */
                 CFE_EVS_SendEvent(GENERIC_CSS_CMD_NOOP_INF_EID, CFE_EVS_EventType_INFORMATION,
                                   "GENERIC_CSS: NOOP command received");
                 /* Third, do the desired command action if applicable, in the case of NOOP it is no operation */
@@ -281,8 +286,6 @@ void GENERIC_CSS_ProcessGroundCommand(void)
         case GENERIC_CSS_ENABLE_CC:
             if (GENERIC_CSS_VerifyCmdLength(GENERIC_CSS_AppData.MsgPtr, sizeof(GENERIC_CSS_NoArgs_cmd_t)) == OS_SUCCESS)
             {
-                CFE_EVS_SendEvent(GENERIC_CSS_CMD_ENABLE_INF_EID, CFE_EVS_EventType_INFORMATION,
-                                  "GENERIC_CSS: Enable command received");
                 GENERIC_CSS_Enable();
             }
             break;
@@ -293,8 +296,6 @@ void GENERIC_CSS_ProcessGroundCommand(void)
         case GENERIC_CSS_DISABLE_CC:
             if (GENERIC_CSS_VerifyCmdLength(GENERIC_CSS_AppData.MsgPtr, sizeof(GENERIC_CSS_NoArgs_cmd_t)) == OS_SUCCESS)
             {
-                CFE_EVS_SendEvent(GENERIC_CSS_CMD_DISABLE_INF_EID, CFE_EVS_EventType_INFORMATION,
-                                  "GENERIC_CSS: Disable command received");
                 GENERIC_CSS_Disable();
             }
             break;
@@ -412,27 +413,46 @@ void GENERIC_CSS_Enable(void)
 {
     int32 status = OS_SUCCESS;
 
-    /* Check that device is disabled */
+    /* Do any necessary checks, confirm that device is currently enabled */
     if (GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled == GENERIC_CSS_DEVICE_DISABLED)
     {
-        /* Open device specific protocols */
+        /* Increment command success counter */
+        GENERIC_CSS_AppData.HkTelemetryPkt.CommandCount++;
+
+        /* Do the action, initialize hardware interface and set enabled */
+        GENERIC_CSS_AppData.Generic_cssI2c.handle = GENERIC_CSS_CFG_HANDLE;
+        GENERIC_CSS_AppData.Generic_cssI2c.isOpen = PORT_CLOSED;
+        GENERIC_CSS_AppData.Generic_cssI2c.speed  = GENERIC_CSS_CFG_BAUDRATE_HZ;
+        GENERIC_CSS_AppData.Generic_cssI2c.addr   = GENERIC_CSS_I2C_ADDRESS;
+
         status = i2c_master_init(&GENERIC_CSS_AppData.Generic_cssI2c);
         if (status == OS_SUCCESS)
         {
-            GENERIC_CSS_AppData.HkTelemetryPkt.DeviceCount++;
             GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_ENABLED;
+
+            /* Increment device success counter */
+            GENERIC_CSS_AppData.HkTelemetryPkt.DeviceCount++;
+
+            /* Send device event success to the console */
             CFE_EVS_SendEvent(GENERIC_CSS_ENABLE_INF_EID, CFE_EVS_EventType_INFORMATION, "GENERIC_CSS: Device enabled");
         }
         else
         {
+            /* Increment device error counter */
             GENERIC_CSS_AppData.HkTelemetryPkt.DeviceErrorCount++;
+
+            /* Send device event failure to the console */
             CFE_EVS_SendEvent(GENERIC_CSS_I2C_INIT_ERR_EID, CFE_EVS_EventType_ERROR,
                               "GENERIC_CSS: I2C port initialization error %d", status);
         }
     }
     else
     {
-        GENERIC_CSS_AppData.HkTelemetryPkt.DeviceErrorCount++;
+        /* Increment command error count */
+        GENERIC_CSS_AppData.HkTelemetryPkt.CommandErrorCount++;
+        ;
+
+        /* Send command event failure to the console */
         CFE_EVS_SendEvent(GENERIC_CSS_ENABLE_ERR_EID, CFE_EVS_EventType_ERROR,
                           "GENERIC_CSS: Device enable failed, already enabled");
     }
@@ -444,16 +464,43 @@ void GENERIC_CSS_Enable(void)
 */
 void GENERIC_CSS_Disable(void)
 {
-    /* Check that device is enabled */
+    int32 status = OS_SUCCESS;
+
+    /* Do any necessary checks, confirm that device is currently enabled */
     if (GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled == GENERIC_CSS_DEVICE_ENABLED)
     {
-        GENERIC_CSS_AppData.HkTelemetryPkt.DeviceCount++;
-        GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_DISABLED;
-        CFE_EVS_SendEvent(GENERIC_CSS_DISABLE_INF_EID, CFE_EVS_EventType_INFORMATION, "GENERIC_CSS: Device disabled");
+        /* Increment command success counter */
+        GENERIC_CSS_AppData.HkTelemetryPkt.CommandCount++;
+
+        /* Do the action, close hardare interface and set disabled */
+        status = i2c_master_close(&GENERIC_CSS_AppData.Generic_cssI2c);
+        if (status == OS_SUCCESS)
+        {
+            GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_DISABLED;
+
+            /* Increment device success counter */
+            GENERIC_CSS_AppData.HkTelemetryPkt.DeviceCount++;
+
+            /* Send device event success to the console */
+            CFE_EVS_SendEvent(GENERIC_CSS_DISABLE_INF_EID, CFE_EVS_EventType_INFORMATION,
+                              "GENERIC_CSS: Device disabled");
+        }
+        else
+        {
+            /* Increment device error counter */
+            GENERIC_CSS_AppData.HkTelemetryPkt.DeviceErrorCount++;
+
+            /* Send device event failure to the console */
+            CFE_EVS_SendEvent(GENERIC_CSS_I2C_CLOSE_ERR_EID, CFE_EVS_EventType_ERROR,
+                              "GENERIC_CSS: Device I2C close error %d", status);
+        }
     }
     else
     {
-        GENERIC_CSS_AppData.HkTelemetryPkt.DeviceErrorCount++;
+        /* Increment command error count */
+        GENERIC_CSS_AppData.HkTelemetryPkt.CommandErrorCount++;
+
+        /* Send command event failure to the console */
         CFE_EVS_SendEvent(GENERIC_CSS_DISABLE_ERR_EID, CFE_EVS_EventType_ERROR,
                           "GENERIC_CSS: Device disable failed, already disabled");
     }
@@ -471,12 +518,7 @@ int32 GENERIC_CSS_VerifyCmdLength(CFE_MSG_Message_t *msg, uint16 expected_length
     size_t            actual_length = 0;
 
     CFE_MSG_GetSize(msg, &actual_length);
-    if (expected_length == actual_length)
-    {
-        /* Increment the command counter upon receipt of an invalid command */
-        GENERIC_CSS_AppData.HkTelemetryPkt.CommandCount++;
-    }
-    else
+    if (expected_length != actual_length)
     {
         CFE_MSG_GetMsgId(msg, &msg_id);
         CFE_MSG_GetFcnCode(msg, &cmd_code);
