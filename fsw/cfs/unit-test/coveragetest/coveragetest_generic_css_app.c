@@ -258,6 +258,9 @@
  
      UT_SetDeferredRetcode(UT_KEY(CFE_SB_Subscribe), 2, CFE_SB_BAD_ARGUMENT);
      UT_TEST_FUNCTION_RC(GENERIC_CSS_AppInit(), CFE_SB_BAD_ARGUMENT);
+
+     UT_SetDeferredRetcode(UT_KEY(CFE_EVS_SendEvent), 1, CFE_EVS_INVALID_PARAMETER);
+     UT_TEST_FUNCTION_RC(GENERIC_CSS_AppInit(), -1040187384);
  }
  
  void Test_GENERIC_CSS_ProcessCommandPacket(void)
@@ -294,7 +297,7 @@
      GENERIC_CSS_ProcessCommandPacket();
      UtAssert_True(EventTest.MatchCount == 0, "GENERIC_CSS_CMD_ERR_EID not generated (%u)",
                    (unsigned int)EventTest.MatchCount);
- 
+                                    
      /* invalid message id */
      TestMsgId = CFE_SB_INVALID_MSG_ID;
      UT_SetDataBuffer(UT_KEY(CFE_MSG_GetMsgId), &TestMsgId, sizeof(TestMsgId), false);
@@ -326,6 +329,19 @@
     GENERIC_CSS_ProcessCommandPacket();
     UtAssert_True(EventTest.MatchCount == 0, "GENERIC_CSS_HK_ERR_EID not generated (%u)",
                   (unsigned int)EventTest.MatchCount);
+
+     /* Request_HK message id with invalid command */
+    TestMsgId = CFE_SB_ValueToMsgId(GENERIC_CSS_REQ_HK_MID);
+    FcnCode   = 99;
+    MsgSize   = sizeof(TestMsg.Noop);
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetMsgId), &TestMsgId, sizeof(TestMsgId), false);
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetMsgId), &TestMsgId, sizeof(TestMsgId), false);
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &FcnCode, sizeof(FcnCode), false);
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetSize), &MsgSize, sizeof(MsgSize), false);
+    GENERIC_CSS_ProcessCommandPacket();
+    UtAssert_True(EventTest.MatchCount == 0, "GENERIC_CSS_HK_ERR_EID not generated (%u)",
+                  (unsigned int)EventTest.MatchCount);
+ 
  
      
  }
@@ -402,6 +418,18 @@
      GENERIC_CSS_ProcessGroundCommand();
      UtAssert_True(EventTest.MatchCount == 1, "GENERIC_CSS_CMD_ENABLE_INF_EID generated (%u)",
                    (unsigned int)EventTest.MatchCount);
+
+     /* test dispatch of ENABLE */
+     FcnCode = GENERIC_CSS_ENABLE_CC;
+     Size    = sizeof(TestMsg.Noop);
+     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetMsgId), &TestMsgId, sizeof(TestMsgId), false);
+     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &FcnCode, sizeof(FcnCode), false);
+     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetSize), &Size, sizeof(Size), false);
+     UT_CheckEvent_Setup(&EventTest, GENERIC_CSS_CMD_ENABLE_INF_EID, NULL);
+     GENERIC_CSS_ProcessGroundCommand();
+     UtAssert_True(EventTest.MatchCount == 1, "GENERIC_CSS_CMD_ENABLE_INF_EID generated (%u)",
+                   (unsigned int)EventTest.MatchCount);
+ 
  
      /* test dispatch of DISABLE */
      FcnCode = GENERIC_CSS_DISABLE_CC;
@@ -413,7 +441,69 @@
      GENERIC_CSS_ProcessGroundCommand();
      UtAssert_True(EventTest.MatchCount == 1, "GENERIC_CSS_CMD_DISABLE_INF_EID generated (%u)",
                    (unsigned int)EventTest.MatchCount);
+
+     /* test dispatch of DISABLE */
+     FcnCode = GENERIC_CSS_DISABLE_CC;
+     Size    = sizeof(TestMsg.Noop);
+     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetMsgId), &TestMsgId, sizeof(TestMsgId), false);
+     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &FcnCode, sizeof(FcnCode), false);
+     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetSize), &Size, sizeof(Size), false);
+     UT_CheckEvent_Setup(&EventTest, GENERIC_CSS_CMD_DISABLE_INF_EID, NULL);
+     GENERIC_CSS_ProcessGroundCommand();
+     UtAssert_True(EventTest.MatchCount == 1, "GENERIC_CSS_CMD_DISABLE_INF_EID generated (%u)",
+                   (unsigned int)EventTest.MatchCount);
  }
+
+ void Test_GENERIC_CSS_Enable(void)
+ {
+     UT_CheckEvent_t EventTest;
+ 
+     UT_CheckEvent_Setup(&EventTest, GENERIC_CSS_ENABLE_INF_EID, NULL);
+     GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_DISABLED;
+     UT_SetDeferredRetcode(UT_KEY(GENERIC_CSS_RequestData), 1, OS_SUCCESS);
+     GENERIC_CSS_Enable();
+     UtAssert_True(EventTest.MatchCount == 1, "GENERIC_CSS: Device enabled (%u)", (unsigned int)EventTest.MatchCount);
+ 
+     UT_CheckEvent_Setup(&EventTest, GENERIC_CSS_I2C_INIT_ERR_EID, NULL);
+     GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_DISABLED;
+     UT_SetDeferredRetcode(UT_KEY(GENERIC_CSS_RequestData), 1, OS_ERROR);
+     GENERIC_CSS_Enable();
+     UtAssert_True(EventTest.MatchCount == 1, "GENERIC_CSS: i2c port initialization error (%u)",
+                   (unsigned int)EventTest.MatchCount);
+ 
+     UT_CheckEvent_Setup(&EventTest, GENERIC_CSS_ENABLE_ERR_EID, NULL);
+     GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_ENABLED;
+     UT_SetDeferredRetcode(UT_KEY(GENERIC_CSS_RequestData), 1, OS_ERROR);
+     GENERIC_CSS_Enable();
+     UtAssert_True(EventTest.MatchCount == 1, "GENERIC_CSS: Device enable failed, already enabled (%u)",
+                   (unsigned int)EventTest.MatchCount);
+ }
+
+ 
+void Test_GENERIC_CSS_Disable(void)
+{
+    UT_CheckEvent_t EventTest;
+
+    UT_CheckEvent_Setup(&EventTest, GENERIC_CSS_DISABLE_INF_EID, NULL);
+    GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_ENABLED;
+    UT_SetDeferredRetcode(UT_KEY(GENERIC_CSS_RequestData), 1, OS_SUCCESS);
+    GENERIC_CSS_Disable();
+    UtAssert_True(EventTest.MatchCount == 1, "GENERIC_CSS: Device disabled (%u)", (unsigned int)EventTest.MatchCount);
+
+    UT_CheckEvent_Setup(&EventTest, GENERIC_CSS_DISABLE_ERR_EID, NULL);
+    GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_ENABLED;
+    UT_SetDeferredRetcode(UT_KEY(GENERIC_CSS_RequestData), 1, OS_ERROR);
+    GENERIC_CSS_Disable();
+    UtAssert_True(EventTest.MatchCount == 1, "GENERIC_CSS: i2c port close error (%u)", (unsigned int)EventTest.MatchCount);
+
+    UT_CheckEvent_Setup(&EventTest, GENERIC_CSS_DISABLE_ERR_EID, NULL);
+    GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_DISABLED;
+    UT_SetDeferredRetcode(UT_KEY(GENERIC_CSS_RequestData), 1, OS_ERROR);
+    GENERIC_CSS_Disable();
+    UtAssert_True(EventTest.MatchCount == 1, "GENERIC_CSS: Device disable failed, already disabled (%u)",
+                  (unsigned int)EventTest.MatchCount);
+}
+
  
  void Test_GENERIC_CSS_ReportHousekeeping(void)
  {
@@ -550,5 +640,7 @@
      ADD_TEST(GENERIC_CSS_ReportHousekeeping);
      ADD_TEST(GENERIC_CSS_ReportDeviceTelemetry);
      ADD_TEST(GENERIC_CSS_VerifyCmdLength);
+     ADD_TEST(GENERIC_CSS_Enable);
+     ADD_TEST(GENERIC_CSS_Disable);
  }
  

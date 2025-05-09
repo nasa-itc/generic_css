@@ -22,6 +22,7 @@
 # inclusion of source files that are normally private
 include_directories(${PROJECT_SOURCE_DIR}/fsw/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/stubs)
 include_directories(${hwlib_MISSION_DIR}/fsw/public_inc)
 
 
