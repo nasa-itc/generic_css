@@ -317,6 +317,8 @@
      GENERIC_CSS_ProcessCommandPacket();
      UtAssert_True(EventTest.MatchCount == 0, "GENERIC_CSS_HK_ERR_EID not generated (%u)",
                    (unsigned int)EventTest.MatchCount);
+    
+    GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled         = GENERIC_CSS_DEVICE_ENABLED;
 
     /* Request_HK message id */
     TestMsgId = CFE_SB_ValueToMsgId(GENERIC_CSS_REQ_HK_MID);
