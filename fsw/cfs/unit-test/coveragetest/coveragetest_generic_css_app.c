@@ -330,6 +330,19 @@
     UtAssert_True(EventTest.MatchCount == 0, "GENERIC_CSS_HK_ERR_EID not generated (%u)",
                   (unsigned int)EventTest.MatchCount);
 
+    /* Request_HK message id */
+    TestMsgId = CFE_SB_ValueToMsgId(GENERIC_CSS_REQ_HK_MID);
+    FcnCode   = GENERIC_CSS_REQ_DATA_TLM;
+    MsgSize   = sizeof(TestMsg.Noop);
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetMsgId), &TestMsgId, sizeof(TestMsgId), false);
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetMsgId), &TestMsgId, sizeof(TestMsgId), false);
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &FcnCode, sizeof(FcnCode), false);
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetSize), &MsgSize, sizeof(MsgSize), false);
+    UT_SetDeferredRetcode(UT_KEY(GENERIC_CSS_RequestData), 1, OS_ERROR);
+    GENERIC_CSS_ProcessCommandPacket();
+    UtAssert_True(EventTest.MatchCount == 0, "GENERIC_CSS_HK_ERR_EID not generated (%u)",
+                  (unsigned int)EventTest.MatchCount);
+
      /* Request_HK message id with invalid command */
     TestMsgId = CFE_SB_ValueToMsgId(GENERIC_CSS_REQ_HK_MID);
     FcnCode   = 99;
@@ -453,57 +466,6 @@
      UtAssert_True(EventTest.MatchCount == 1, "GENERIC_CSS_CMD_DISABLE_INF_EID generated (%u)",
                    (unsigned int)EventTest.MatchCount);
  }
-
- void Test_GENERIC_CSS_Enable(void)
- {
-     UT_CheckEvent_t EventTest;
- 
-     UT_CheckEvent_Setup(&EventTest, GENERIC_CSS_ENABLE_INF_EID, NULL);
-     GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_DISABLED;
-     UT_SetDeferredRetcode(UT_KEY(GENERIC_CSS_RequestData), 1, OS_SUCCESS);
-     GENERIC_CSS_Enable();
-     UtAssert_True(EventTest.MatchCount == 1, "GENERIC_CSS: Device enabled (%u)", (unsigned int)EventTest.MatchCount);
- 
-     UT_CheckEvent_Setup(&EventTest, GENERIC_CSS_I2C_INIT_ERR_EID, NULL);
-     GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_DISABLED;
-     UT_SetDeferredRetcode(UT_KEY(GENERIC_CSS_RequestData), 1, OS_ERROR);
-     GENERIC_CSS_Enable();
-     UtAssert_True(EventTest.MatchCount == 1, "GENERIC_CSS: i2c port initialization error (%u)",
-                   (unsigned int)EventTest.MatchCount);
- 
-     UT_CheckEvent_Setup(&EventTest, GENERIC_CSS_ENABLE_ERR_EID, NULL);
-     GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_ENABLED;
-     UT_SetDeferredRetcode(UT_KEY(GENERIC_CSS_RequestData), 1, OS_ERROR);
-     GENERIC_CSS_Enable();
-     UtAssert_True(EventTest.MatchCount == 1, "GENERIC_CSS: Device enable failed, already enabled (%u)",
-                   (unsigned int)EventTest.MatchCount);
- }
-
- 
-void Test_GENERIC_CSS_Disable(void)
-{
-    UT_CheckEvent_t EventTest;
-
-    UT_CheckEvent_Setup(&EventTest, GENERIC_CSS_DISABLE_INF_EID, NULL);
-    GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_ENABLED;
-    UT_SetDeferredRetcode(UT_KEY(GENERIC_CSS_RequestData), 1, OS_SUCCESS);
-    GENERIC_CSS_Disable();
-    UtAssert_True(EventTest.MatchCount == 1, "GENERIC_CSS: Device disabled (%u)", (unsigned int)EventTest.MatchCount);
-
-    UT_CheckEvent_Setup(&EventTest, GENERIC_CSS_DISABLE_ERR_EID, NULL);
-    GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_ENABLED;
-    UT_SetDeferredRetcode(UT_KEY(GENERIC_CSS_RequestData), 1, OS_ERROR);
-    GENERIC_CSS_Disable();
-    UtAssert_True(EventTest.MatchCount == 1, "GENERIC_CSS: i2c port close error (%u)", (unsigned int)EventTest.MatchCount);
-
-    UT_CheckEvent_Setup(&EventTest, GENERIC_CSS_DISABLE_ERR_EID, NULL);
-    GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_DISABLED;
-    UT_SetDeferredRetcode(UT_KEY(GENERIC_CSS_RequestData), 1, OS_ERROR);
-    GENERIC_CSS_Disable();
-    UtAssert_True(EventTest.MatchCount == 1, "GENERIC_CSS: Device disable failed, already disabled (%u)",
-                  (unsigned int)EventTest.MatchCount);
-}
-
  
  void Test_GENERIC_CSS_ReportHousekeeping(void)
  {
@@ -537,40 +499,75 @@ void Test_GENERIC_CSS_Disable(void)
                    "CFE_SB_TimeStampMsg() address matches expected");
  }
  
- void Test_GENERIC_CSS_ReportDeviceTelemetry(void)
- {
-    GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_ENABLED;
-     /*
-      * Test Case For:
-      * void Test_GENERIC_CSS_ReportDeviceTelemetry()
-      */
-     CFE_MSG_Message_t *MsgSend;
-     CFE_MSG_Message_t *MsgTimestamp;
-     CFE_SB_MsgId_t     MsgId = CFE_SB_ValueToMsgId(GENERIC_CSS_REQ_DATA_TLM);
  
-     /* Set message id to return so GENERIC_CSS_Housekeeping will be called */
-     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetMsgId), &MsgId, sizeof(MsgId), false);
- 
-     /* Set up to capture send message address */
-     UT_SetDataBuffer(UT_KEY(CFE_SB_TransmitMsg), &MsgSend, sizeof(MsgSend), false);
- 
-     /* Set up to capture timestamp message address */
-     UT_SetDataBuffer(UT_KEY(CFE_SB_TimeStampMsg), &MsgTimestamp, sizeof(MsgTimestamp), false);
- 
-     /* Call unit under test, NULL pointer confirms command access is through APIs */
-     GENERIC_CSS_ReportDeviceTelemetry();
- 
-     /* Confirm message sent*/
-     UtAssert_True(UT_GetStubCount(UT_KEY(CFE_SB_TransmitMsg)) == 1, "CFE_SB_TransmitMsg() called once");
-     UtAssert_True(MsgSend == &GENERIC_CSS_AppData.HkTelemetryPkt.TlmHeader.Msg, "CFE_SB_TransmitMsg() address matches expected");
- 
-     /* Confirm timestamp msg address */
-     UtAssert_True(UT_GetStubCount(UT_KEY(CFE_SB_TimeStampMsg)) == 1, "CFE_SB_TimeStampMsg() called once");
-     UtAssert_True(MsgTimestamp == &GENERIC_CSS_AppData.HkTelemetryPkt.TlmHeader.Msg,
-                   "CFE_SB_TimeStampMsg() address matches expected");
+void Test_GENERIC_CSS_ReportDeviceTelemetry(void)
+{
+    GENERIC_CSS_ReportDeviceTelemetry();
+
+    UT_SetDeferredRetcode(UT_KEY(GENERIC_CSS_RequestData), 1, OS_SUCCESS);
+    GENERIC_CSS_ReportDeviceTelemetry();
+
+    UT_SetDeferredRetcode(UT_KEY(GENERIC_CSS_RequestData), 1, OS_ERROR);
+    GENERIC_CSS_ReportDeviceTelemetry();
 
     GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_DISABLED;
- }
+    GENERIC_CSS_ReportDeviceTelemetry();
+
+    GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled         = GENERIC_CSS_DEVICE_ENABLED;
+    GENERIC_CSS_ReportDeviceTelemetry();
+}
+
+ 
+void Test_GENERIC_CSS_Enable(void)
+{
+    UT_CheckEvent_t EventTest;
+
+    UT_CheckEvent_Setup(&EventTest, GENERIC_CSS_ENABLE_INF_EID, NULL);
+    GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_DISABLED;
+    UT_SetDeferredRetcode(UT_KEY(i2c_master_init), 1, OS_SUCCESS);
+    GENERIC_CSS_Enable();
+    UtAssert_True(EventTest.MatchCount == 1, "GENERIC_CSS: Device enabled (%u)", (unsigned int)EventTest.MatchCount);
+
+    UT_CheckEvent_Setup(&EventTest, GENERIC_CSS_I2C_INIT_ERR_EID, NULL);
+    GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_DISABLED;
+    UT_SetDeferredRetcode(UT_KEY(i2c_master_init), 1, OS_ERROR);
+    GENERIC_CSS_Enable();
+    UtAssert_True(EventTest.MatchCount == 1, "GENERIC_CSS: UART port initialization error (%u)",
+                  (unsigned int)EventTest.MatchCount);
+
+    UT_CheckEvent_Setup(&EventTest, GENERIC_CSS_ENABLE_ERR_EID, NULL);
+    GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_ENABLED;
+    UT_SetDeferredRetcode(UT_KEY(i2c_master_init), 1, OS_ERROR);
+    GENERIC_CSS_Enable();
+    UtAssert_True(EventTest.MatchCount == 1, "GENERIC_CSS: Device enable failed, already enabled (%u)",
+                  (unsigned int)EventTest.MatchCount);
+}
+
+
+void Test_GENERIC_CSS_Disable(void)
+{
+    UT_CheckEvent_t EventTest;
+
+    UT_CheckEvent_Setup(&EventTest, GENERIC_CSS_DISABLE_INF_EID, NULL);
+    GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_ENABLED;
+    UT_SetDeferredRetcode(UT_KEY(i2c_master_close), 1, OS_SUCCESS);
+    GENERIC_CSS_Disable();
+    UtAssert_True(EventTest.MatchCount == 1, "GENERIC_CSS: Device disabled (%u)", (unsigned int)EventTest.MatchCount);
+
+    UT_CheckEvent_Setup(&EventTest, GENERIC_CSS_I2C_CLOSE_ERR_EID, NULL);
+    GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_ENABLED;
+    UT_SetDeferredRetcode(UT_KEY(i2c_master_close), 1, OS_ERROR);
+    GENERIC_CSS_Disable();
+    UtAssert_True(EventTest.MatchCount == 1, "GENERIC_CSS: UART port close error (%u)", (unsigned int)EventTest.MatchCount);
+
+    UT_CheckEvent_Setup(&EventTest, GENERIC_CSS_DISABLE_ERR_EID, NULL);
+    GENERIC_CSS_AppData.HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_DISABLED;
+    UT_SetDeferredRetcode(UT_KEY(i2c_master_close), 1, OS_ERROR);
+    GENERIC_CSS_Disable();
+    UtAssert_True(EventTest.MatchCount == 1, "GENERIC_CSS: Device disable failed, already disabled (%u)",
+                  (unsigned int)EventTest.MatchCount);
+}
+
  
  void Test_GENERIC_CSS_VerifyCmdLength(void)
  {

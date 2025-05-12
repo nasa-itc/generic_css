@@ -1,20 +1,5 @@
-/*******************************************************************************
-** File: generic_css_device.h
-**
-** Purpose:
-**   This is the header file for the GENERIC_CSS device.
-**
-*******************************************************************************/
-#define _GENERIC_CSS_DEVICE_H_
-
-/**
- * @file
- *
- * Auto-Generated stub implementations for functions defined in generic_css_device header
- */
-
-#include "generic_css_device.h"
 #include "utgenstub.h"
+#include "generic_css_device.h"
 
 /*
  * ----------------------------------------------------

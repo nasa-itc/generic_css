@@ -1,12 +1,3 @@
-/* Copyright (C) 2009 - 2018 National Aeronautics and Space Administration. All Foreign Rights are Reserved to the U.S.
-Government.
-
-/**
- * @file
- *
- * Auto-Generated stub implementations for functions defined in libi2c header
- */
-
 #include "libi2c.h"
 #include "utgenstub.h"
 
