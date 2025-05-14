@@ -12,7 +12,9 @@ namespace Nos3
     public:
         /* Constructors */
         Generic_cssDataPoint(double count);
+        Generic_cssDataPoint(int valid[6], double illum[6]);
         Generic_cssDataPoint(double scaleFactor, int16_t spacecraft, const boost::shared_ptr<Sim42DataPoint> dp);
+        ~Generic_cssDataPoint(void) {};
 
         /* Accessors */
         /* Provide the hardware model a way to get the specific data out of the data point */
@@ -23,7 +25,6 @@ namespace Nos3
         /* Disallow these */
         Generic_cssDataPoint(void) {};
         Generic_cssDataPoint(const Generic_cssDataPoint&) {};
-        ~Generic_cssDataPoint(void) {};
         /// @name Private mutators
         //@{
         inline void parse_data_point(void) const {if (_not_parsed) do_parsing();}

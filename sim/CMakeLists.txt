@@ -12,6 +12,7 @@ set(generic_css_sim_src
     src/generic_css_hardware_model.cpp
     src/generic_css_42_data_provider.cpp
     src/generic_css_data_provider.cpp
+    src/generic_css_shmem_data_provider.cpp
     src/generic_css_data_point.cpp
 )
 

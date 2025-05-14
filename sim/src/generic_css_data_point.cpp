@@ -38,6 +38,18 @@ namespace Nos3
         _generic_css_data[5] = count * 0.001;
     }
 
+    Generic_cssDataPoint::Generic_cssDataPoint(int valid[6], double illum[6]) : _not_parsed(false)
+    {
+        _generic_css_data.resize(6);
+        for (int i = 0; i < 6; i++) {
+            if (valid[i]) {
+                _generic_css_data[i] = illum[i];
+            } else {
+                _generic_css_data[i] = 0.0;
+            }
+        }
+    }
+
     Generic_cssDataPoint::Generic_cssDataPoint(double scale_factor, int16_t spacecraft, const boost::shared_ptr<Sim42DataPoint> dp) : _dp(*dp), _sc(spacecraft), _scale_factor(scale_factor), _not_parsed(true)
     {
         sim_logger->trace("Generic_cssDataPoint::Generic_cssDataPoint:  42 Constructor executed");
