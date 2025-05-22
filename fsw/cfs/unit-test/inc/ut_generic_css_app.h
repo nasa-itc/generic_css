@@ -46,6 +46,6 @@
 /*
  * Allow UT access to the global "GENERIC_CSS_APP_Data" object.
  */
-//extern GENERIC_CSS_AppData_t GENERIC_CSS_APP_Data;
+// extern GENERIC_CSS_AppData_t GENERIC_CSS_APP_Data;
 
 #endif /* UT_GENERIC_CSS_APP_H */
