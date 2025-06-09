@@ -45,6 +45,8 @@ namespace Components {
     {
         printf("I2C device %d failed to initialize! \n", Generic_CSSI2c.handle);
     }
+
+    status = i2c_master_close(&Generic_CSSI2c);
   }
 
   Generic_css ::
@@ -160,21 +162,31 @@ namespace Components {
 
   void Generic_css :: REQUEST_HOUSEKEEPING_cmdHandler(FwOpcodeType opCode, U32 cmdSeq){
 
-    this->tlmWrite_ADCVoltage0(Generic_CSSData.Voltage[0]);
-    this->tlmWrite_ADCVoltage1(Generic_CSSData.Voltage[1]);
-    this->tlmWrite_ADCVoltage2(Generic_CSSData.Voltage[2]);
-    this->tlmWrite_ADCVoltage3(Generic_CSSData.Voltage[3]);
-    this->tlmWrite_ADCVoltage4(Generic_CSSData.Voltage[4]);
-    this->tlmWrite_ADCVoltage5(Generic_CSSData.Voltage[5]);
+    if(HkTelemetryPkt.DeviceEnabled == GENERIC_CSS_DEVICE_ENABLED)
+    {
+      HkTelemetryPkt.CommandCount++;
+      this->tlmWrite_ADCVoltage0(Generic_CSSData.Voltage[0]);
+      this->tlmWrite_ADCVoltage1(Generic_CSSData.Voltage[1]);
+      this->tlmWrite_ADCVoltage2(Generic_CSSData.Voltage[2]);
+      this->tlmWrite_ADCVoltage3(Generic_CSSData.Voltage[3]);
+      this->tlmWrite_ADCVoltage4(Generic_CSSData.Voltage[4]);
+      this->tlmWrite_ADCVoltage5(Generic_CSSData.Voltage[5]);
 
-    this->tlmWrite_CommandCount(HkTelemetryPkt.CommandCount);
-    this->tlmWrite_CommandErrorCount(HkTelemetryPkt.CommandErrorCount);
-    this->tlmWrite_DeviceCount(HkTelemetryPkt.DeviceCount);
-    this->tlmWrite_DeviceErrorCount(HkTelemetryPkt.DeviceErrorCount);
-    this->tlmWrite_DeviceEnabled(get_active_state(HkTelemetryPkt.DeviceEnabled));
+      this->tlmWrite_CommandCount(HkTelemetryPkt.CommandCount);
+      this->tlmWrite_CommandErrorCount(HkTelemetryPkt.CommandErrorCount);
+      this->tlmWrite_DeviceCount(HkTelemetryPkt.DeviceCount);
+      this->tlmWrite_DeviceErrorCount(HkTelemetryPkt.DeviceErrorCount);
+      this->tlmWrite_DeviceEnabled(get_active_state(HkTelemetryPkt.DeviceEnabled));
 
-    this->log_ACTIVITY_HI_TELEM("Requested Housekeeping!");
-    OS_printf("Requested Housekeeping!\n");
+      this->log_ACTIVITY_HI_TELEM("Requested Housekeeping!");
+      OS_printf("Requested Housekeeping!\n");
+    }
+    else
+    {
+      this->log_ACTIVITY_HI_TELEM("Device Disabled!");
+      OS_printf("Device Disabled!\n");
+    }
+
 
     this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::OK);
   }
