@@ -200,17 +200,31 @@ namespace Components {
 
   int32_t status = OS_SUCCESS;
 
-  status = GENERIC_CSS_RequestData(&Generic_CSSI2c, &Generic_CSSData);
-  if (status == OS_SUCCESS)
-  {
-    this->log_ACTIVITY_HI_TELEM("Request Data command success\n");
-    OS_printf("RequestData command successful!\n");
+  if(HkTelemetryPkt.DeviceEnabled == GENERIC_CSS_DEVICE_ENABLED){
+    HkTelemetryPkt.CommandCount++;
+
+    status = GENERIC_CSS_RequestData(&Generic_CSSI2c, &Generic_CSSData);
+    if (status == OS_SUCCESS)
+    {
+      HkTelemetryPkt.DeviceCount++;
+      
+      this->log_ACTIVITY_HI_TELEM("Request Data command success\n");
+      OS_printf("RequestData command successful!\n");
+    }
+    else
+    {
+      HkTelemetryPkt.DeviceErrorCount++;
+      this->log_ACTIVITY_HI_TELEM("Request Data command failed!\n");
+      OS_printf("RequestData command failed!\n");
+    }
 
   }
   else
   {
-    this->log_ACTIVITY_HI_TELEM("Request Data command failed!\n");
-    OS_printf("RequestData command failed!\n");
+    HkTelemetryPkt.CommandErrorCount++;
+    this->log_ACTIVITY_HI_TELEM("Request Data failed, Device Disabled!");
+      OS_printf("Request Data failed, Device Disabled!\n");
+
   }
 
   this->tlmWrite_ADCVoltage0(Generic_CSSData.Voltage[0]);
@@ -219,6 +233,10 @@ namespace Components {
   this->tlmWrite_ADCVoltage3(Generic_CSSData.Voltage[3]);
   this->tlmWrite_ADCVoltage4(Generic_CSSData.Voltage[4]);
   this->tlmWrite_ADCVoltage5(Generic_CSSData.Voltage[5]);
+  this->tlmWrite_CommandCount(HkTelemetryPkt.CommandCount);
+  this->tlmWrite_CommandErrorCount(HkTelemetryPkt.CommandErrorCount);
+  this->tlmWrite_DeviceCount(HkTelemetryPkt.DeviceCount);
+  this->tlmWrite_DeviceErrorCount(HkTelemetryPkt.DeviceErrorCount);
 
   // Tell the fprime command system that we have completed the processing of the supplied command with OK status
   this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::OK);
