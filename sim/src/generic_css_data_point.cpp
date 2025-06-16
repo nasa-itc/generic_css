@@ -57,7 +57,7 @@ namespace Nos3
             ** 42 data stream defined in `42/Source/IPC/SimWriteToSocket.c`
             */
             std::string key0v;
-            key0v.append("SC[").append(std::to_string(_sc)).append("].AC.CSS"); // SC[N].AC.CSS
+            key0v.append("SC[").append(std::to_string(_sc)).append("].CSS"); // SC[N].CSS
             std::string key0i(key0v), key1v(key0v), key1i(key0v), key2v(key0v), key2i(key0v), key3v(key0v), key3i(key0v), key4v(key0v), key4i(key0v), key5v(key0v), key5i(key0v);
             key0v.append("[0].Valid");
             key0i.append("[0].Illum");
