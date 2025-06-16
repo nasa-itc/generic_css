@@ -1,6 +1,12 @@
 module Components {
     @ generic_css
     active component Generic_css {
+
+        @ CSS output port
+        output port CSSout: CSSDataPort
+
+        @ Periodic Data CSS
+        async input port updateData: Svc.Sched
         
         @ Command to Request Data
         async command REQUEST_DATA()

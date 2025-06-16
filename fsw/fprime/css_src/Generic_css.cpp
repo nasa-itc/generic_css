@@ -93,15 +93,31 @@ namespace Components {
   ADCVoltage4 = Generic_CSSData.Voltage[4];
   ADCVoltage5 = Generic_CSSData.Voltage[5];
 
-  this->tlmWrite_ADCVoltage0(ADCVoltage0);
-  this->tlmWrite_ADCVoltage1(ADCVoltage1);
-  this->tlmWrite_ADCVoltage2(ADCVoltage2);
-  this->tlmWrite_ADCVoltage3(ADCVoltage3);
-  this->tlmWrite_ADCVoltage4(ADCVoltage4);
-  this->tlmWrite_ADCVoltage5(ADCVoltage5);
+  this->tlmWrite_ADCVoltage0(Generic_CSSData.Voltage[0]);
+  this->tlmWrite_ADCVoltage1(Generic_CSSData.Voltage[1]);
+  this->tlmWrite_ADCVoltage2(Generic_CSSData.Voltage[2]);
+  this->tlmWrite_ADCVoltage3(Generic_CSSData.Voltage[3]);
+  this->tlmWrite_ADCVoltage4(Generic_CSSData.Voltage[4]);
+  this->tlmWrite_ADCVoltage5(Generic_CSSData.Voltage[5]);
 
   // Tell the fprime command system that we have completed the processing of the supplied command with OK status
   this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::OK);
+}
+
+void Generic_css :: updateData_handler(const NATIVE_INT_TYPE portNum, NATIVE_UINT_TYPE context)
+{
+  int32_t status = OS_SUCCESS;
+
+  status = GENERIC_CSS_RequestData(&Generic_CSSI2c, &Generic_CSSData);
+
+  this->tlmWrite_ADCVoltage0(Generic_CSSData.Voltage[0]);
+  this->tlmWrite_ADCVoltage1(Generic_CSSData.Voltage[1]);
+  this->tlmWrite_ADCVoltage2(Generic_CSSData.Voltage[2]);
+  this->tlmWrite_ADCVoltage3(Generic_CSSData.Voltage[3]);
+  this->tlmWrite_ADCVoltage4(Generic_CSSData.Voltage[4]);
+  this->tlmWrite_ADCVoltage5(Generic_CSSData.Voltage[5]);
+
+  this->CSSout_out(0, Generic_CSSData.Voltage[0], Generic_CSSData.Voltage[1], Generic_CSSData.Voltage[2], Generic_CSSData.Voltage[3], Generic_CSSData.Voltage[4], Generic_CSSData.Voltage[5]);
 }
 
 
