@@ -67,7 +67,6 @@ namespace Components {
     HkTelemetryPkt.CommandCount++;
 
     this->log_ACTIVITY_HI_TELEM("NOOP command success!");
-    OS_printf("NOOP command successful!\n");
 
     this->tlmWrite_CommandCount(HkTelemetryPkt.CommandCount);
     this->tlmWrite_DeviceEnabled(get_active_state(HkTelemetryPkt.DeviceEnabled));
@@ -93,14 +92,12 @@ namespace Components {
         HkTelemetryPkt.DeviceCount++;
 
         this->log_ACTIVITY_HI_TELEM("Enable command success!");
-        OS_printf("Enable command successful!\n");
       }
       else
       {
         HkTelemetryPkt.DeviceErrorCount++;
 
         this->log_ACTIVITY_HI_TELEM("Enable command failed to init I2C!");
-        OS_printf("Enable command failed to init I2C!\n");
       }
     }
     else
@@ -108,7 +105,6 @@ namespace Components {
       HkTelemetryPkt.CommandErrorCount++;
 
       this->log_ACTIVITY_HI_TELEM("Enable failed, already Enabled!");
-      OS_printf("Enable failed, already Enabled!\n");
     }
 
     this->tlmWrite_CommandCount(HkTelemetryPkt.CommandCount);
@@ -134,14 +130,12 @@ namespace Components {
         HkTelemetryPkt.DeviceCount++;
 
         this->log_ACTIVITY_HI_TELEM("Disable command success!");
-        OS_printf("Disable command successful!\n");
       }
       else
       {
         HkTelemetryPkt.DeviceErrorCount++;
         
         this->log_ACTIVITY_HI_TELEM("Disable command failed to close I2C!");
-        OS_printf("Disable command failed to close I2C!\n");
       }
     }
     else
@@ -149,7 +143,6 @@ namespace Components {
       HkTelemetryPkt.CommandErrorCount++;
 
       this->log_ACTIVITY_HI_TELEM("Disable failed, already Disabled!");
-      OS_printf("Disable failed, already Disabled!\n");
     }
 
     this->tlmWrite_CommandCount(HkTelemetryPkt.CommandCount);
@@ -180,12 +173,10 @@ namespace Components {
       this->tlmWrite_DeviceEnabled(get_active_state(HkTelemetryPkt.DeviceEnabled));
 
       this->log_ACTIVITY_HI_TELEM("Requested Housekeeping!");
-      OS_printf("Requested Housekeeping!\n");
     }
     else
     {
-      this->log_ACTIVITY_HI_TELEM("Device Disabled!");
-      OS_printf("Device Disabled!\n");
+      this->log_ACTIVITY_HI_TELEM("HK failed, Device Disabled!");
     }
 
 
@@ -199,7 +190,6 @@ namespace Components {
     HkTelemetryPkt.DeviceErrorCount = 0;
 
     this->log_ACTIVITY_HI_TELEM("Reset Counters command successful!");
-    OS_printf("Reset Counters command successful!\n");
     this->tlmWrite_CommandCount(HkTelemetryPkt.CommandCount);
     this->tlmWrite_CommandErrorCount(HkTelemetryPkt.CommandErrorCount);
     this->tlmWrite_DeviceCount(HkTelemetryPkt.DeviceCount);
@@ -222,13 +212,11 @@ namespace Components {
       HkTelemetryPkt.DeviceCount++;
       
       this->log_ACTIVITY_HI_TELEM("Request Data command success\n");
-      OS_printf("RequestData command successful!\n");
     }
     else
     {
       HkTelemetryPkt.DeviceErrorCount++;
       this->log_ACTIVITY_HI_TELEM("Request Data command failed!\n");
-      OS_printf("RequestData command failed!\n");
     }
 
   }
@@ -236,7 +224,6 @@ namespace Components {
   {
     HkTelemetryPkt.CommandErrorCount++;
     this->log_ACTIVITY_HI_TELEM("Request Data failed, Device Disabled!");
-      OS_printf("Request Data failed, Device Disabled!\n");
 
   }
 
