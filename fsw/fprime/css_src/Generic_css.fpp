@@ -8,13 +8,49 @@ module Components {
         @ Periodic Data CSS
         async input port updateData: Svc.Sched
         
+        @ Component Enable State
+        enum ActiveState {
+            DISABLED @< DISABLED
+            ENABLED @< ENABLED
+        }
+
+        @ NOOP Command
+        async command NOOP()
+        
         @ Command to Request Data
         async command REQUEST_DATA()
 
+        @ Enable Command
+        async command ENABLE()
+
+        @ Disable Command
+        async command DISABLE()
+
+        @ REQUEST HK Command
+        async command REQUEST_HOUSEKEEPING()
+
+        @ Reset Counters Command
+        async command RESET_COUNTERS()
+
         @ event with maximum greeting length of 30 characters
         event TELEM(
-            log_info: string size 30 @<
+            log_info: string size 40 @<
         ) severity activity high format "Generic_css: {}"
+
+        @ Command Count
+        telemetry CommandCount: U32
+
+        @ Command Error Count
+        telemetry CommandErrorCount: U32
+
+        @ Device Count
+        telemetry DeviceCount: U32
+
+        @ Device Error Count
+        telemetry DeviceErrorCount: U32
+
+        @ Device Enable
+        telemetry DeviceEnabled: ActiveState
 
         @ A count of the number of greetings issues
         telemetry ADCVoltage0: U16
