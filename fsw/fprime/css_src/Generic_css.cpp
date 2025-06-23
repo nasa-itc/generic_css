@@ -29,7 +29,7 @@ namespace Components {
     HkTelemetryPkt.CommandErrorCount = 0;
     HkTelemetryPkt.DeviceCount = 0;
     HkTelemetryPkt.DeviceErrorCount = 0;
-    HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_DISABLED;
+    HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_ENABLED;
 
     /* Open device specific protocols */
     Generic_CSSI2c.handle = GENERIC_CSS_CFG_HANDLE;
@@ -46,7 +46,7 @@ namespace Components {
         printf("I2C device %d failed to initialize! \n", Generic_CSSI2c.handle);
     }
 
-    status = i2c_master_close(&Generic_CSSI2c);
+    // status = i2c_master_close(&Generic_CSSI2c);
   }
 
   Generic_css ::
