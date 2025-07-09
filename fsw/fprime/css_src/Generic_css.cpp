@@ -248,7 +248,15 @@ void Generic_css :: updateData_handler(const NATIVE_INT_TYPE portNum, NATIVE_UIN
 
   status = GENERIC_CSS_RequestData(&Generic_CSSI2c, &Generic_CSSData);
 
-  this->CSSout_out(0, Generic_CSSData.Voltage[0], Generic_CSSData.Voltage[1], Generic_CSSData.Voltage[2], Generic_CSSData.Voltage[3], Generic_CSSData.Voltage[4], Generic_CSSData.Voltage[5]);
+  if(status == OS_SUCCESS)
+  {
+    HkTelemetryPkt.DeviceCount++;
+    this->CSSout_out(0, Generic_CSSData.Voltage[0], Generic_CSSData.Voltage[1], Generic_CSSData.Voltage[2], Generic_CSSData.Voltage[3], Generic_CSSData.Voltage[4], Generic_CSSData.Voltage[5]);
+  }
+  else
+  {
+    HkTelemetryPkt.DeviceErrorCount++;
+  }
 }
 
 void Generic_css :: updateTlm_handler(const NATIVE_INT_TYPE portNum, NATIVE_UINT_TYPE context)
