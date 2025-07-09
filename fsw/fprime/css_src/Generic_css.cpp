@@ -251,6 +251,20 @@ void Generic_css :: updateData_handler(const NATIVE_INT_TYPE portNum, NATIVE_UIN
   this->CSSout_out(0, Generic_CSSData.Voltage[0], Generic_CSSData.Voltage[1], Generic_CSSData.Voltage[2], Generic_CSSData.Voltage[3], Generic_CSSData.Voltage[4], Generic_CSSData.Voltage[5]);
 }
 
+void Generic_css :: updateTlm_handler(const NATIVE_INT_TYPE portNum, NATIVE_UINT_TYPE context)
+{
+  this->tlmWrite_ADCVoltage0(Generic_CSSData.Voltage[0]);
+  this->tlmWrite_ADCVoltage1(Generic_CSSData.Voltage[1]);
+  this->tlmWrite_ADCVoltage2(Generic_CSSData.Voltage[2]);
+  this->tlmWrite_ADCVoltage3(Generic_CSSData.Voltage[3]);
+  this->tlmWrite_ADCVoltage4(Generic_CSSData.Voltage[4]);
+  this->tlmWrite_ADCVoltage5(Generic_CSSData.Voltage[5]);
+  this->tlmWrite_CommandCount(HkTelemetryPkt.CommandCount);
+  this->tlmWrite_CommandErrorCount(HkTelemetryPkt.CommandErrorCount);
+  this->tlmWrite_DeviceCount(HkTelemetryPkt.DeviceCount);
+  this->tlmWrite_DeviceErrorCount(HkTelemetryPkt.DeviceErrorCount);
+}
+
 inline Generic_css_ActiveState Generic_css :: get_active_state(uint8_t DeviceEnabled)
 {
   Generic_css_ActiveState state;

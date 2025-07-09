@@ -7,6 +7,9 @@ module Components {
 
         @ Periodic Data CSS
         async input port updateData: Svc.Sched
+
+        @ Periodic Tlm CSS
+        async input port updateTlm: Svc.Sched
         
         @ Component Enable State
         enum ActiveState {
