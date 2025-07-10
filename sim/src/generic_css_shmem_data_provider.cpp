@@ -22,7 +22,7 @@ namespace Nos3
     {
         boost::shared_ptr<Generic_cssDataPoint> dp;
         {
-            bip::scoped_lock<bip::interprocess_mutex> lock(_blackboard_data->mutex);
+            boost::shared_lock<boost::shared_mutex> lock(_blackboard_data->mutex);
             dp = boost::shared_ptr<Generic_cssDataPoint>(
                 new Generic_cssDataPoint(_blackboard_data->CSSValid, _blackboard_data->CSSIllum));
             // lock is released when scope ends
