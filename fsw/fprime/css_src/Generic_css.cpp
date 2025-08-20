@@ -29,7 +29,7 @@ namespace Components {
     HkTelemetryPkt.CommandErrorCount = 0;
     HkTelemetryPkt.DeviceCount = 0;
     HkTelemetryPkt.DeviceErrorCount = 0;
-    HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_DISABLED;
+    HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_ENABLED;
 
     /* Open device specific protocols */
     Generic_CSSI2c.handle = GENERIC_CSS_CFG_HANDLE;
@@ -46,7 +46,7 @@ namespace Components {
         printf("I2C device %d failed to initialize! \n", Generic_CSSI2c.handle);
     }
 
-    status = i2c_master_close(&Generic_CSSI2c);
+    // status = i2c_master_close(&Generic_CSSI2c);
   }
 
   Generic_css ::
@@ -240,6 +240,37 @@ namespace Components {
 
   // Tell the fprime command system that we have completed the processing of the supplied command with OK status
   this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::OK);
+}
+
+void Generic_css :: updateData_handler(const NATIVE_INT_TYPE portNum, NATIVE_UINT_TYPE context)
+{
+  int32_t status = OS_SUCCESS;
+
+  status = GENERIC_CSS_RequestData(&Generic_CSSI2c, &Generic_CSSData);
+
+  if(status == OS_SUCCESS)
+  {
+    HkTelemetryPkt.DeviceCount++;
+    this->CSSout_out(0, Generic_CSSData.Voltage[0], Generic_CSSData.Voltage[1], Generic_CSSData.Voltage[2], Generic_CSSData.Voltage[3], Generic_CSSData.Voltage[4], Generic_CSSData.Voltage[5]);
+  }
+  else
+  {
+    HkTelemetryPkt.DeviceErrorCount++;
+  }
+}
+
+void Generic_css :: updateTlm_handler(const NATIVE_INT_TYPE portNum, NATIVE_UINT_TYPE context)
+{
+  this->tlmWrite_ADCVoltage0(Generic_CSSData.Voltage[0]);
+  this->tlmWrite_ADCVoltage1(Generic_CSSData.Voltage[1]);
+  this->tlmWrite_ADCVoltage2(Generic_CSSData.Voltage[2]);
+  this->tlmWrite_ADCVoltage3(Generic_CSSData.Voltage[3]);
+  this->tlmWrite_ADCVoltage4(Generic_CSSData.Voltage[4]);
+  this->tlmWrite_ADCVoltage5(Generic_CSSData.Voltage[5]);
+  this->tlmWrite_CommandCount(HkTelemetryPkt.CommandCount);
+  this->tlmWrite_CommandErrorCount(HkTelemetryPkt.CommandErrorCount);
+  this->tlmWrite_DeviceCount(HkTelemetryPkt.DeviceCount);
+  this->tlmWrite_DeviceErrorCount(HkTelemetryPkt.DeviceErrorCount);
 }
 
 inline Generic_css_ActiveState Generic_css :: get_active_state(uint8_t DeviceEnabled)

@@ -2,6 +2,15 @@ module Components {
     @ generic_css
     active component Generic_css {
 
+        @ CSS output port
+        output port CSSout: CSSDataPort
+
+        @ Periodic Data CSS
+        async input port updateData: Svc.Sched
+
+        @ Periodic Tlm CSS
+        async input port updateTlm: Svc.Sched
+        
         @ Component Enable State
         enum ActiveState {
             DISABLED @< DISABLED
