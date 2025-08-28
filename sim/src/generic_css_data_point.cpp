@@ -43,6 +43,26 @@ namespace Nos3
         sim_logger->trace("Generic_cssDataPoint::Generic_cssDataPoint:  42 Constructor executed");
     }
 
+    Generic_cssDataPoint::Generic_cssDataPoint(double scale_factor, int valid0, int valid1, int valid2, int valid3, int valid4, int valid5,
+        double illum0, double illum1, double illum2, double illum3, double illum4, double illum5) : 
+        _scale_factor(scale_factor), _not_parsed(false)
+    {
+        std::vector<float> illum(6, 0.0);
+        _generic_css_data = illum;
+        _generic_css_data[0] = illum0/_scale_factor;
+        if (valid0 == 0) _generic_css_data[0] = 0.0;
+        _generic_css_data[1] = illum1/_scale_factor;
+        if (valid1 == 0) _generic_css_data[1] = 0.0;
+        _generic_css_data[2] = illum2/_scale_factor;
+        if (valid2 == 0) _generic_css_data[2] = 0.0;
+        _generic_css_data[3] = illum3/_scale_factor;
+        if (valid3 == 0) _generic_css_data[3] = 0.0;
+        _generic_css_data[4] = illum4/_scale_factor;
+        if (valid4 == 0) _generic_css_data[4] = 0.0;
+        _generic_css_data[5] = illum5/_scale_factor;
+        if (valid5 == 0) _generic_css_data[5] = 0.0;
+    }
+
     void Generic_cssDataPoint::do_parsing(void) const
     {
         /* Initialize data */
