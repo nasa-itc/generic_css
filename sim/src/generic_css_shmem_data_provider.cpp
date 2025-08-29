@@ -26,14 +26,12 @@ namespace Nos3
         /* Get the 42 data */
         boost::shared_ptr<Generic_cssDataPoint> dp;
         {
-            boost::shared_lock<boost::shared_mutex> lock(_blackboard_data->mutex);
             dp = boost::shared_ptr<Generic_cssDataPoint>(
                 new Generic_cssDataPoint(_scale_factor,
                     _blackboard_data->CSSValid[0], _blackboard_data->CSSValid[1], _blackboard_data->CSSValid[2], 
                     _blackboard_data->CSSValid[3], _blackboard_data->CSSValid[4], _blackboard_data->CSSValid[5], 
                     _blackboard_data->CSSIllum[0], _blackboard_data->CSSIllum[1], _blackboard_data->CSSIllum[2], 
                     _blackboard_data->CSSIllum[3], _blackboard_data->CSSIllum[4], _blackboard_data->CSSIllum[5]));
-            // lock is released when scope ends
         }
         return dp;
     }
