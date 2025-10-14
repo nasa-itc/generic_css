@@ -5,7 +5,8 @@
 // ======================================================================
 
 #include "css_src/Generic_css.hpp"
-#include "FpConfig.hpp"
+// #include "FpConfig.hpp"
+#include "Fw/FPrimeBasicTypes.hpp"
 #include <Fw/Log/LogString.hpp>
 
 

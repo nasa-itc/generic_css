@@ -54,7 +54,7 @@ namespace Components {
       //! Destroy Generic_css object
       ~Generic_css();
 
-    PRIVATE:
+    private:
 
       // ----------------------------------------------------------------------
       // Handler implementations for commands
