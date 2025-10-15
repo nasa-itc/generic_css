@@ -257,7 +257,7 @@ namespace Components {
   this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::OK);
 }
 
-void Generic_css :: updateData_handler(const NATIVE_INT_TYPE portNum, NATIVE_UINT_TYPE context)
+void Generic_css :: updateData_handler(const FwIndexType portNum, U32 context)
 {
   int32_t status = OS_SUCCESS;
 
@@ -274,7 +274,7 @@ void Generic_css :: updateData_handler(const NATIVE_INT_TYPE portNum, NATIVE_UIN
   }
 }
 
-void Generic_css :: updateTlm_handler(const NATIVE_INT_TYPE portNum, NATIVE_UINT_TYPE context)
+void Generic_css :: updateTlm_handler(const FwIndexType portNum, U32 context)
 {
   this->tlmWrite_ADCVoltage0(Generic_CSSData.Voltage[0]);
   this->tlmWrite_ADCVoltage1(Generic_CSSData.Voltage[1]);
