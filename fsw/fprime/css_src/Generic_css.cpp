@@ -5,7 +5,9 @@
 // ======================================================================
 
 #include "css_src/Generic_css.hpp"
-#include "FpConfig.hpp"
+// #include "FpConfig.hpp"
+#include "Fw/FPrimeBasicTypes.hpp"
+#include <Fw/Log/LogString.hpp>
 
 
 namespace Components {
@@ -66,7 +68,8 @@ namespace Components {
   void Generic_css :: NOOP_cmdHandler(FwOpcodeType opCode, U32 cmdSeq){
     HkTelemetryPkt.CommandCount++;
 
-    this->log_ACTIVITY_HI_TELEM("NOOP command success!");
+    Fw::LogStringArg log_msg("NOOP command success!");
+    this->log_ACTIVITY_HI_TELEM(log_msg);
 
     this->tlmWrite_CommandCount(HkTelemetryPkt.CommandCount);
     this->tlmWrite_DeviceEnabled(get_active_state(HkTelemetryPkt.DeviceEnabled));
@@ -91,20 +94,23 @@ namespace Components {
         HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_ENABLED;
         HkTelemetryPkt.DeviceCount++;
 
-        this->log_ACTIVITY_HI_TELEM("Enable command success!");
+        Fw::LogStringArg log_msg("Enable command success!");
+        this->log_ACTIVITY_HI_TELEM(log_msg);
       }
       else
       {
         HkTelemetryPkt.DeviceErrorCount++;
 
-        this->log_ACTIVITY_HI_TELEM("Enable command failed to init I2C!");
+        Fw::LogStringArg log_msg("Enable command failed to init I2C!");
+        this->log_ACTIVITY_HI_TELEM(log_msg);
       }
     }
     else
     {
       HkTelemetryPkt.CommandErrorCount++;
 
-      this->log_ACTIVITY_HI_TELEM("Enable failed, already Enabled!");
+      Fw::LogStringArg log_msg("Enable failed, already Enabled!");
+      this->log_ACTIVITY_HI_TELEM(log_msg);
     }
 
     this->tlmWrite_CommandCount(HkTelemetryPkt.CommandCount);
@@ -129,20 +135,23 @@ namespace Components {
         HkTelemetryPkt.DeviceEnabled = GENERIC_CSS_DEVICE_DISABLED;
         HkTelemetryPkt.DeviceCount++;
 
-        this->log_ACTIVITY_HI_TELEM("Disable command success!");
+        Fw::LogStringArg log_msg("Disable command success!");
+        this->log_ACTIVITY_HI_TELEM(log_msg);
       }
       else
       {
         HkTelemetryPkt.DeviceErrorCount++;
         
-        this->log_ACTIVITY_HI_TELEM("Disable command failed to close I2C!");
+        Fw::LogStringArg log_msg("Disable command failed to close I2C!");
+        this->log_ACTIVITY_HI_TELEM(log_msg);
       }
     }
     else
     {
       HkTelemetryPkt.CommandErrorCount++;
 
-      this->log_ACTIVITY_HI_TELEM("Disable failed, already Disabled!");
+      Fw::LogStringArg log_msg("Disable failed, already Disabled!");
+      this->log_ACTIVITY_HI_TELEM(log_msg);
     }
 
     this->tlmWrite_CommandCount(HkTelemetryPkt.CommandCount);
@@ -172,11 +181,13 @@ namespace Components {
       this->tlmWrite_DeviceErrorCount(HkTelemetryPkt.DeviceErrorCount);
       this->tlmWrite_DeviceEnabled(get_active_state(HkTelemetryPkt.DeviceEnabled));
 
-      this->log_ACTIVITY_HI_TELEM("Requested Housekeeping!");
+      Fw::LogStringArg log_msg("Requested Housekeeping!");
+      this->log_ACTIVITY_HI_TELEM(log_msg);
     }
     else
     {
-      this->log_ACTIVITY_HI_TELEM("HK failed, Device Disabled!");
+      Fw::LogStringArg log_msg("HK failed, Device Disabled!");
+      this->log_ACTIVITY_HI_TELEM(log_msg);
     }
 
 
@@ -189,7 +200,8 @@ namespace Components {
     HkTelemetryPkt.DeviceCount = 0;
     HkTelemetryPkt.DeviceErrorCount = 0;
 
-    this->log_ACTIVITY_HI_TELEM("Reset Counters command successful!");
+    Fw::LogStringArg log_msg("Reset Counters command successful!");
+    this->log_ACTIVITY_HI_TELEM(log_msg);
     this->tlmWrite_CommandCount(HkTelemetryPkt.CommandCount);
     this->tlmWrite_CommandErrorCount(HkTelemetryPkt.CommandErrorCount);
     this->tlmWrite_DeviceCount(HkTelemetryPkt.DeviceCount);
@@ -211,19 +223,22 @@ namespace Components {
     {
       HkTelemetryPkt.DeviceCount++;
       
-      this->log_ACTIVITY_HI_TELEM("Request Data command success\n");
+      Fw::LogStringArg log_msg("Request Data command success\n");
+      this->log_ACTIVITY_HI_TELEM(log_msg);
     }
     else
     {
       HkTelemetryPkt.DeviceErrorCount++;
-      this->log_ACTIVITY_HI_TELEM("Request Data command failed!\n");
+      Fw::LogStringArg log_msg("Request Data command failed!\n");
+      this->log_ACTIVITY_HI_TELEM(log_msg);
     }
 
   }
   else
   {
     HkTelemetryPkt.CommandErrorCount++;
-    this->log_ACTIVITY_HI_TELEM("Request Data failed, Device Disabled!");
+    Fw::LogStringArg log_msg("Request Data failed, Device Disabled!");
+    this->log_ACTIVITY_HI_TELEM(log_msg);
 
   }
 
@@ -242,7 +257,7 @@ namespace Components {
   this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::OK);
 }
 
-void Generic_css :: updateData_handler(const NATIVE_INT_TYPE portNum, NATIVE_UINT_TYPE context)
+void Generic_css :: updateData_handler(const FwIndexType portNum, U32 context)
 {
   int32_t status = OS_SUCCESS;
 
@@ -259,7 +274,7 @@ void Generic_css :: updateData_handler(const NATIVE_INT_TYPE portNum, NATIVE_UIN
   }
 }
 
-void Generic_css :: updateTlm_handler(const NATIVE_INT_TYPE portNum, NATIVE_UINT_TYPE context)
+void Generic_css :: updateTlm_handler(const FwIndexType portNum, U32 context)
 {
   this->tlmWrite_ADCVoltage0(Generic_CSSData.Voltage[0]);
   this->tlmWrite_ADCVoltage1(Generic_CSSData.Voltage[1]);
