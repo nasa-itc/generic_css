@@ -44,7 +44,6 @@ The various configuration parameters available for each portion of the component
 
 ## 42
 
-
 # Documentation
 If this generic_css application had an ICD and/or test procedure, they would be linked here.
 
