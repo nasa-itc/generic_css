@@ -16,12 +16,12 @@ GENERIC_CSS_DEVICE_TRUTH_MARGIN = 100
 #
 def get_generic_css_hk():
     cmd("GENERIC_CSS_DEBUG GENERIC_CSS_REQ_HK")
-    wait_check_packet("GENERIC_CSS", "GENERIC_CSS_HK_TLM", 1, GENERIC_CSS_RESPONSE_TIMEOUT)
+    wait_check_packet("GENERIC_CSS_DEBUG", "GENERIC_CSS_HK_TLM", 1, GENERIC_CSS_RESPONSE_TIMEOUT)
     time.sleep(GENERIC_CSS_CMD_SLEEP)
 
 def get_generic_css_data():
     cmd("GENERIC_CSS_DEBUG GENERIC_CSS_REQ_DATA")
-    wait_check_packet("GENERIC_CSS", "GENERIC_CSS_DATA_TLM", 1, GENERIC_CSS_RESPONSE_TIMEOUT)
+    wait_check_packet("GENERIC_CSS_DEBUG", "GENERIC_CSS_DATA_TLM", 1, GENERIC_CSS_RESPONSE_TIMEOUT)
     time.sleep(GENERIC_CSS_CMD_SLEEP)
 
 def generic_css_cmd(command_string):
