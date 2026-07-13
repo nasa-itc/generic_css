@@ -28,12 +28,12 @@ def run_generic_css_device_test():
         safe_generic_css() # Get to known state
 
         # Manually command to disable when already disabled
-        cmd_cnt = tlm("GENERIC_CSS GENERIC_CSS_HK_TLM CMD_COUNT")
-        cmd_err_cnt = tlm("GENERIC_CSS GENERIC_CSS_HK_TLM CMD_ERR_COUNT")
-        cmd("GENERIC_CSS GENERIC_CSS_DISABLE_CC")
+        cmd_cnt = tlm("GENERIC_CSS_DEBUG GENERIC_CSS_HK_TLM CMD_COUNT")
+        cmd_err_cnt = tlm("GENERIC_CSS_DEBUG GENERIC_CSS_HK_TLM CMD_ERR_COUNT")
+        cmd("GENERIC_CSS_DEBUG GENERIC_CSS_DISABLE_CC")
         get_generic_css_hk()
-        check(f"GENERIC_CSS GENERIC_CSS_HK_TLM CMD_COUNT == {cmd_cnt}")
-        check(f"GENERIC_CSS GENERIC_CSS_HK_TLM CMD_ERR_COUNT == {cmd_err_cnt+1}")
+        check(f"GENERIC_CSS_DEBUG GENERIC_CSS_HK_TLM CMD_COUNT == {cmd_cnt}")
+        check(f"GENERIC_CSS_DEBUG GENERIC_CSS_HK_TLM CMD_ERR_COUNT == {cmd_err_cnt+1}")
 
         # Enable
         enable_generic_css()
@@ -45,12 +45,12 @@ def run_generic_css_device_test():
         confirm_generic_css_data_loop()
 
         # Manually command to enable when already enabled
-        cmd_cnt = tlm("GENERIC_CSS GENERIC_CSS_HK_TLM CMD_COUNT")
-        cmd_err_cnt = tlm("GENERIC_CSS GENERIC_CSS_HK_TLM CMD_ERR_COUNT")
-        cmd("GENERIC_CSS GENERIC_CSS_ENABLE_CC")
+        cmd_cnt = tlm("GENERIC_CSS_DEBUG GENERIC_CSS_HK_TLM CMD_COUNT")
+        cmd_err_cnt = tlm("GENERIC_CSS_DEBUG GENERIC_CSS_HK_TLM CMD_ERR_COUNT")
+        cmd("GENERIC_CSS_DEBUG GENERIC_CSS_ENABLE_CC")
         get_generic_css_hk()
-        check(f"GENERIC_CSS GENERIC_CSS_HK_TLM CMD_COUNT == {cmd_cnt}")
-        check(f"GENERIC_CSS GENERIC_CSS_HK_TLM CMD_ERR_COUNT == {cmd_err_cnt+1}")
+        check(f"GENERIC_CSS_DEBUG GENERIC_CSS_HK_TLM CMD_COUNT == {cmd_cnt}")
+        check(f"GENERIC_CSS_DEBUG GENERIC_CSS_HK_TLM CMD_ERR_COUNT == {cmd_err_cnt+1}")
 
         # Reconfirm data remains as expected
         confirm_generic_css_data_loop()

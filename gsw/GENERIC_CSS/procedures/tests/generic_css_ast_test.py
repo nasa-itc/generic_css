@@ -29,11 +29,11 @@ def run_generic_css_ast_test():
         generic_css_prepare_ast()
 
         # Disable sim and confirm device error counts increase
-        dev_cmd_cnt = tlm("GENERIC_CSS GENERIC_CSS_HK_TLM DEVICE_COUNT")
-        dev_cmd_err_cnt = tlm("GENERIC_CSS GENERIC_CSS_HK_TLM DEVICE_ERR_COUNT")
+        dev_cmd_cnt = tlm("GENERIC_CSS_DEBUG GENERIC_CSS_HK_TLM DEVICE_COUNT")
+        dev_cmd_err_cnt = tlm("GENERIC_CSS_DEBUG GENERIC_CSS_HK_TLM DEVICE_ERR_COUNT")
         generic_css_sim_disable()
-        check(f"GENERIC_CSS GENERIC_CSS_HK_TLM DEVICE_COUNT == {dev_cmd_cnt}")
-        check(f"GENERIC_CSS GENERIC_CSS_HK_TLM DEVICE_ERR_COUNT >= {dev_cmd_err_cnt}")
+        check(f"GENERIC_CSS_DEBUG GENERIC_CSS_HK_TLM DEVICE_COUNT == {dev_cmd_cnt}")
+        check(f"GENERIC_CSS_DEBUG GENERIC_CSS_HK_TLM DEVICE_ERR_COUNT >= {dev_cmd_err_cnt}")
 
         # Enable sim and confirm return to nominal operation
         generic_css_sim_enable()
